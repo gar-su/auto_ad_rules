@@ -123,6 +123,20 @@
             width: 250px;
             font-size: 14px;
         }
+        .search-dim {
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+            min-width: 100px;
+        }
+        .search-dim + .search-input {
+            border-radius: 0;
+            border-left: none;
+        }
         .search-icon {
             border: 1px solid #d9d9d9;
             border-left: none;
@@ -662,6 +676,11 @@
                     <button class="tab-btn">排除</button>
                 </div>
                 <div class="search-bar">
+                    <select class="search-dim">
+                        <option value="drama_name">短剧名称</option>
+                        <option value="script_id">剧本编号</option>
+                        <option value="script_name">剧本名称</option>
+                    </select>
                     <input type="text" class="search-input" placeholder="请输入短剧名称">
                     <button class="search-btn">搜索</button>
                 </div>
@@ -673,6 +692,7 @@
                             <thead>
                                 <tr>
                                     <th><input type="checkbox"></th>
+                                    <th>剧本编号</th>
                                     <th>剧本名称</th>
                                     <th>短剧名称</th>
                                     <th>语种</th>
@@ -681,42 +701,49 @@
                             <tbody>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240501001</td>
                                     <td>病区晚风（AI配音）</td>
                                     <td>(Dubbed) Scheme for My Wealth? No Way!</td>
                                     <td>English</td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240502002</td>
                                     <td>Falling in love by a mistaken vow-3</td>
                                     <td>Falling in love by a mistaken vow</td>
                                     <td>English</td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240503003</td>
                                     <td>退婚后，迟机长他争又抢</td>
                                     <td>You Cheat? I Got Better.</td>
                                     <td>English</td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240504004</td>
                                     <td>No More Mercy for My Ex</td>
                                     <td>No More Mercy for My Ex</td>
                                     <td>English</td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240505005</td>
                                     <td>Cry For Losing Me-3</td>
                                     <td>Cry For Losing Me</td>
                                     <td>English</td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240506006</td>
                                     <td>漂移吧洗车大叔2赤子凌云-3</td>
                                     <td>Drift King: Rise of the Phantom Racer</td>
                                     <td>English</td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox"></td>
+                                    <td>SC20240507007</td>
                                     <td>栀栀屿归-3</td>
                                     <td>Done Being the Mistress of My Billionaire Crush</td>
                                     <td>English</td>
@@ -748,6 +775,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>剧本编号</th>
                                     <th>剧本名称</th>
                                     <th>语种</th>
                                     <th>操作</th>
@@ -1160,6 +1188,17 @@
         }
     });
 
+    // ========== 2.6 短剧搜索维度切换 ==========
+    document.querySelector('.search-dim')?.addEventListener('change', function() {
+        const input = this.nextElementSibling;
+        const map = {
+            drama_name: '请输入短剧名称',
+            script_id: '请输入剧本编号',
+            script_name: '请输入剧本名称'
+        };
+        input.placeholder = map[this.value] || '';
+    });
+
     // ========== 3. 触发条件管理 ==========
     const condContainer = document.querySelector('.trigger-condition');
 
@@ -1286,7 +1325,10 @@
             const rowIdx = [...leftTbody.querySelectorAll('tr')].indexOf(leftRow);
 
             if (e.target.checked) {
-                const data = [...leftRow.querySelectorAll('td')].slice(1).map(td => td.textContent.trim()).slice(0, rightCols);
+                let data = [...leftRow.querySelectorAll('td')].slice(1).map(td => td.textContent.trim());
+                // 左表列数可能多于右表（如短剧左表5列→右表3数据列），跳过中间列
+                if (data.length > rightCols) data = [...data.slice(0, rightCols - 1), data[data.length - 1]];
+                data = data.slice(0, rightCols);
                 const tr = document.createElement('tr');
                 data.forEach(t => { const td = document.createElement('td'); td.textContent = t; tr.appendChild(td); });
                 // Fill remaining data cols if needed
