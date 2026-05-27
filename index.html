@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建[FB]规则控损</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            border-radius: 4px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .back-btn {
+            color: #1677ff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin: 25px 0 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #1677ff;
+            margin-right: 8px;
+        }
+        .form-item {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .form-label {
+            width: 100px;
+            color: #333;
+            font-size: 14px;
+            padding-top: 6px;
+        }
+        .form-label span {
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+        .input-box {
+            flex: 1;
+            max-width: 350px;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status-group {
+            display: flex;
+        }
+        .status-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .status-btn.active {
+            background-color: #1677ff;
+            color: #fff;
+        }
+        .status-btn:not(.active) {
+            background-color: #f0f0f0;
+            color: #333;
+            margin-left: -1px;
+        }
+        .tab-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            padding: 6px 16px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .tab-btn.active {
+            background-color: #1677ff;
+            color: #fff;
+            border-color: #1677ff;
+        }
+        .tab-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        .tab-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .search-input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px 0 0 4px;
+            width: 250px;
+            font-size: 14px;
+        }
+        .search-icon {
+            border: 1px solid #d9d9d9;
+            border-left: none;
+            padding: 6px 10px;
+            background: #fff;
+            cursor: pointer;
+        }
+        .search-btn {
+            background-color: #1677ff;
+            color: #fff;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .batch-toggle {
+            color: #1677ff;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+        .batch-area {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .batch-textarea {
+            flex: 1;
+            max-width: 600px;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .table-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .table-wrapper {
+            flex: 1;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .selected-wrapper {
+            flex: 1;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        th {
+            background-color: #fafafa;
+            font-weight: 500;
+        }
+        .row-selected {
+            background-color: #e6f7ff;
+        }
+        .delete-btn {
+            color: #ff4d4f;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .clear-all {
+            text-align: right;
+            margin: 10px;
+        }
+        .clear-all a {
+            color: #1677ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 10px;
+        }
+        .page-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            margin: 0 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .page-btn.active {
+            background-color: #1677ff;
+            color: #fff;
+            border-color: #1677ff;
+        }
+        .page-size {
+            margin-left: 10px;
+            padding: 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        /* 标签样式 */
+        .tag-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .tag .close {
+            margin-left: 6px;
+            cursor: pointer;
+            color: #999;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        /* 时间选择 */
+        .form-label.required::before {
+            content: "*";
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+        .form-content {
+            flex: 1;
+        }
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .time-input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .time-add {
+            color: #1677ff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .time-tip {
+            font-size: 14px;
+            color: #666;
+            margin-left: 8px;
+        }
+        /* 触发条件区域 */
+        .trigger-condition .condition-top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .trigger-select {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        .condition-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .condition-row .select-box {
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 180px;
+        }
+        .condition-row .time-select {
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        .condition-row .operator-select {
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 80px;
+        }
+        .condition-row .value-input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 180px;
+        }
+        .percent-input {
+            display: flex;
+            align-items: center;
+        }
+        .percent-input input {
+            border-right: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .percent-input .percent-symbol {
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-left: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-add, .btn-del {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-add {
+            background-color: #1677ff;
+            color: white;
+        }
+        .btn-del {
+            background-color: white;
+            color: #ff4d4f;
+            border: 1px solid #ff4d4f;
+        }
+        .or-line {
+            color: #1677ff;
+            font-size: 14px;
+            margin: 12px 0;
+            cursor: pointer;
+        }
+        .add-or-btn {
+            background-color: #1677ff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        .delete-text {
+            color: #ff4d4f;
+            font-size: 14px;
+            margin-left: 16px;
+            cursor: pointer;
+        }
+        /* 触发操作按钮组 */
+        .action-group {
+            display: flex;
+            gap: 4px;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            background-color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .action-btn.active {
+            background-color: #1677ff;
+            color: white;
+            border-color: #1677ff;
+        }
+        /* 警告方式单选 */
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+        .radio-item input {
+            margin: 0;
+        }
+        /* 警告频率 */
+        .frequency-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .frequency-input input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 120px;
+        }
+        /* 警告范围复选 */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+        /* 底部按钮 */
+        .footer-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 40px;
+        }
+        .footer-btn {
+            padding: 8px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .cancel-btn {
+            border: 1px solid #d9d9d9;
+            background-color: white;
+            color: #333;
+        }
+        .save-btn {
+            background-color: #1677ff;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="#" class="back-btn">&lt; 返回</a>
+            <h2 style="font-size: 16px; font-weight: 500;">创建[FB]规则控损</h2>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="section-title">基本信息</div>
+        <div class="form-item">
+            <label class="form-label"><span>*</span>名称:</label>
+            <input type="text" id="name" class="input-box" placeholder="请输入名称">
+        </div>
+        <div class="form-item">
+            <label class="form-label"><span>*</span>状态:</label>
+            <div class="status-group">
+                <button class="status-btn active">生效</button>
+                <button class="status-btn">停用</button>
+            </div>
+        </div>
+
+        <!-- 控损对象 -->
+        <div class="section-title">控损对象</div>
+        <div class="form-item">
+            <label class="form-label"><span>*</span>时区:</label>
+            <select class="input-box">
+                <option>零时区</option>
+            </select>
+        </div>
+
+        <!-- 账户范围 -->
+        <div class="form-item">
+            <label class="form-label"><span>*</span>账户范围:</label>
+            <div style="width: 100%;">
+                <div class="tab-group">
+                    <button class="tab-btn">全部</button>
+                    <button class="tab-btn active">部分</button>
+                    <button class="tab-btn">排除</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="请输入账户ID/名称">
+                    <span class="search-icon">🔍</span>
+                    <button class="search-btn">搜索</button>
+                </div>
+
+                <div class="table-container">
+                    <!-- 左侧账户列表 -->
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox"></th>
+                                    <th>账户名称</th>
+                                    <th>账户ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="row-selected">
+                                    <td><input type="checkbox" checked></td>
+                                    <td>FB-MAD-NS- FHH-西五-M13-0410-3</td>
+                                    <td>25801740262838890</td>
+                                </tr>
+                                <tr class="row-selected">
+                                    <td><input type="checkbox" checked></td>
+                                    <td>FB-MAD-NS- FHH-西五-M13-0410-2</td>
+                                    <td>1041381905512320</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>FB-MAD-NS- FHH-西五-M13-0410-4</td>
+                                    <td>808685111836004</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>FB-MAD-NS-XK-MGUO-TC/MY/JP/KR-曼东</td>
+                                    <td>961626380183600</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>FB-MAD-NS-XK-MGUO-VN/ID/IN-曼东</td>
+                                    <td>1302826464614071</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>FB-MAD-NS-XK-MGUO-AR/TR/TH-曼东</td>
+                                    <td>1297590561880005</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>FB-MAD-XK-东八区-TC/MY/JP/KR-曼东</td>
+                                    <td>1492033395950640</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" style="padding: 10px;">
+                            <button class="page-btn">&lt;</button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                            <span>...</span>
+                            <button class="page-btn">179</button>
+                            <button class="page-btn">&gt;</button>
+                            <select class="page-size">
+                                <option>10 条/页</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 右侧已选中账户 -->
+                    <div class="selected-wrapper">
+                        <div class="clear-all">
+                            <a href="#">清空全部</a>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>账户名称</th>
+                                    <th>账户ID</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>FB-MAD-NS- FHH-西五-M13-0410-3</td>
+                                    <td>25801740262838890</td>
+                                    <td><button class="delete-btn">🗑</button></td>
+                                </tr>
+                                <tr>
+                                    <td>FB-MAD-NS- FHH-西五-M13-0410-2</td>
+                                    <td>1041381905512320</td>
+                                    <td><button class="delete-btn">🗑</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 短剧范围 -->
+        <div class="form-item">
+            <label class="form-label" style="padding-top: 0;"><span>*</span>app类型:</label>
+            <select class="input-box">
+                <option>NetShort</option>
+            </select>
+        </div>
+        <div class="form-item">
+            <label class="form-label"><span>*</span>语种:</label>
+            <div class="tag-group">
+                <span class="tag">English <span class="close">×</span></span>
+                <span class="tag">简体中文 <span class="close">×</span></span>
+            </div>
+        </div>
+        <div class="form-item">
+            <label class="form-label"><span>*</span>业务类型:</label>
+            <select class="input-box">
+                <option>全部</option>
+            </select>
+        </div>
+        <div class="form-item">
+            <label class="form-label">渠道号名称:</label>
+            <div class="tag-group">
+                <span class="tag">NASCUAAAAB-(收费)-ns投放SC新像素测试渠道通用 <span class="close">×</span></span>
+            </div>
+        </div>
+        <div class="form-item">
+            <label class="form-label"><span>*</span>短剧范围:</label>
+            <div style="width: 100%;">
+                <div class="tab-group">
+                    <button class="tab-btn">全部</button>
+                    <button class="tab-btn active">部分</button>
+                    <button class="tab-btn">排除</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="请输入短剧名称">
+                    <button class="search-btn">搜索</button>
+                </div>
+
+                <div class="table-container">
+                    <!-- 左侧短剧列表 -->
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox"></th>
+                                    <th>剧本名称</th>
+                                    <th>短剧名称</th>
+                                    <th>语种</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>病区晚风（AI配音）</td>
+                                    <td>(Dubbed) Scheme for My Wealth? No Way!</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Falling in love by a mistaken vow-3</td>
+                                    <td>Falling in love by a mistaken vow</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>退婚后，迟机长他争又抢</td>
+                                    <td>You Cheat? I Got Better.</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>No More Mercy for My Ex</td>
+                                    <td>No More Mercy for My Ex</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Cry For Losing Me-3</td>
+                                    <td>Cry For Losing Me</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>漂移吧洗车大叔2赤子凌云-3</td>
+                                    <td>Drift King: Rise of the Phantom Racer</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>栀栀屿归-3</td>
+                                    <td>Done Being the Mistress of My Billionaire Crush</td>
+                                    <td>English</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" style="padding: 10px; justify-content: center;">
+                            <span style="margin-right: 10px;">共 5736 项</span>
+                            <button class="page-btn">&lt;</button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                            <span>...</span>
+                            <button class="page-btn">192</button>
+                            <button class="page-btn">&gt;</button>
+                            <select class="page-size">
+                                <option>30 条/页</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 右侧已选中短剧 -->
+                    <div class="selected-wrapper">
+                        <div class="clear-all">
+                            <a href="#">清空全部</a>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>剧本名称</th>
+                                    <th>语种</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="empty-state">
+                                            <div class="icon">📭</div>
+                                            <div>暂无数据</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户范围 -->
+        <div class="form-item">
+            <label class="form-label"><span>*</span>用户范围:</label>
+            <div style="width: 100%;">
+                <div class="tab-group" style="margin-bottom: 15px;">
+                    <button class="tab-btn active">部门</button>
+                    <button class="tab-btn">人员</button>
+                </div>
+                <div class="table-container">
+                    <!-- 左侧部门树形选择 -->
+                    <div class="table-wrapper" style="flex: 1; max-height: 350px; overflow-y: auto; border: 1px solid #e8e8e8; border-radius: 4px; padding: 15px;">
+                        <div style="margin-bottom: 10px;">
+                            <input type="checkbox" id="all-dept">
+                            <label for="all-dept">全选</label>
+                        </div>
+                        <div style="margin-left: 10px;">
+                            <div style="margin-bottom: 10px;">
+                                <input type="checkbox" id="dept-root">
+                                <label for="dept-root">投放部门</label>
+                            </div>
+                            <div style="margin-left: 25px; line-height: 2;">
+                                <div><input type="checkbox" id="dept1-1"> <label for="dept1-1">海外投放二部</label></div>
+                                <div><input type="checkbox" id="dept1-2"> <label for="dept1-2">海外投放一部</label></div>
+                                <div><input type="checkbox" id="dept1-3" checked> <label for="dept1-3">海外投放三部</label></div>
+                                <div><input type="checkbox" id="dept1-4"> <label for="dept1-4">海外投放五部</label></div>
+                                <div><input type="checkbox" id="dept1-5"> <label for="dept1-5">海外投放六部</label></div>
+                                <div><input type="checkbox" id="dept1-6"> <label for="dept1-6">海外投放七部</label></div>
+                                <div><input type="checkbox" id="dept1-7"> <label for="dept1-7">海外投放四部</label></div>
+                            </div>
+                            <div style="margin-left: 0; margin-top: 15px; line-height: 2;">
+                                <div><input type="checkbox" id="dept2-1"> <label for="dept2-1">海外素材一部</label></div>
+                                <div><input type="checkbox" id="dept2-2"> <label for="dept2-2">海外素材二部</label></div>
+                                <div><input type="checkbox" id="dept2-3"> <label for="dept2-3">海外素材三部</label></div>
+                                <div><input type="checkbox" id="dept2-4"> <label for="dept2-4">海外素材四部</label></div>
+                                <div><input type="checkbox" id="dept2-5"> <label for="dept2-5">海外素材五部</label></div>
+                                <div><input type="checkbox" id="dept2-6"> <label for="dept2-6">海外素材六部</label></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 右侧已选部门列表 -->
+                    <div class="selected-wrapper" style="flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span style="font-size: 14px; color: #333;">已选0人员 6部门</span>
+                            <a href="#" style="color: #1677ff; text-decoration: none; font-size: 14px;">清空</a>
+                        </div>
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">已选部门:</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #fff9e6; border-left: 3px solid #ffc107; border-radius: 2px;">
+                                <span>海外投放三部</span>
+                                <button style="background: none; border: none; cursor: pointer; color: #999; font-size: 16px; line-height: 1;">×</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #fff9e6; border-left: 3px solid #ffc107; border-radius: 2px;">
+                                <span>海外投放三部四组</span>
+                                <button style="background: none; border: none; cursor: pointer; color: #999; font-size: 16px; line-height: 1;">×</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #fff9e6; border-left: 3px solid #ffc107; border-radius: 2px;">
+                                <span>海外投放三部一组</span>
+                                <button style="background: none; border: none; cursor: pointer; color: #999; font-size: 16px; line-height: 1;">×</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #fff9e6; border-left: 3px solid #ffc107; border-radius: 2px;">
+                                <span>海外投放三部二组</span>
+                                <button style="background: none; border: none; cursor: pointer; color: #999; font-size: 16px; line-height: 1;">×</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #fff9e6; border-left: 3px solid #ffc107; border-radius: 2px;">
+                                <span>海外投放三部三组</span>
+                                <button style="background: none; border: none; cursor: pointer; color: #999; font-size: 16px; line-height: 1;">×</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #fff9e6; border-left: 3px solid #ffc107; border-radius: 2px;">
+                                <span>海外投放三部五组</span>
+                                <button style="background: none; border: none; cursor: pointer; color: #999; font-size: 16px; line-height: 1;">×</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推广链接 -->
+        <div class="form-item">
+            <label class="form-label"><span>*</span>推广链接:</label>
+            <div style="width: 100%;">
+                <div class="tab-group">
+                    <button class="tab-btn">全部</button>
+                    <button class="tab-btn active">部分</button>
+                    <button class="tab-btn">排除</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="搜索推广链接">
+                    <button class="search-btn">搜索</button>
+                </div>
+                <div class="batch-area" style="display:none;">
+                    <textarea class="batch-textarea" rows="3" placeholder="每行一个，支持输入链接ID批量搜索"></textarea>
+                    <button class="search-btn" style="margin-left:0;">搜索</button>
+                </div>
+                <span class="batch-toggle">批量搜索</span>
+                <div class="table-container">
+                    <!-- 左侧监测链接列表 -->
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox"></th>
+                                    <th>链接名称</th>
+                                    <th>链接ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059214674490560513-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-WT</td>
+                                    <td>2059214674490560513</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059271375637975042-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-JZ</td>
+                                    <td>2059271375637975042</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059271366024634369-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-JZ</td>
+                                    <td>2059271366024634369</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059212498196242434-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-XTING</td>
+                                    <td>2059212498196242434</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059180016855945218-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST</td>
+                                    <td>2059180016855945218</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059187420557479937-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ</td>
+                                    <td>2059187420557479937</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2059160285495169025-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN</td>
+                                    <td>2059160285495169025</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" style="padding: 10px;">
+                            <span style="margin-right: 10px;">共 3352954 项</span>
+                            <button class="page-btn">&lt;</button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                            <span>...</span>
+                            <button class="page-btn">111766</button>
+                            <button class="page-btn">&gt;</button>
+                            <select class="page-size">
+                                <option>30 条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- 右侧已选中监测链接 -->
+                    <div class="selected-wrapper">
+                        <div class="clear-all">
+                            <a href="#">清空全部</a>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>链接名称</th>
+                                    <th>链接ID</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="empty-state">
+                                            <div class="icon">📭</div>
+                                            <div>暂无数据</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控损规则 -->
+        <div class="section-title">控损规则</div>
+
+        <!-- 生效时间 -->
+        <div class="form-item">
+            <label class="form-label"><span>*</span>生效时间:</label>
+            <div class="form-content">
+                <div class="time-range">
+                    <input type="text" class="time-input" placeholder="开始时间">
+                    <span>→</span>
+                    <input type="text" class="time-input" placeholder="结束时间">
+                    <span class="time-tip">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 14.9L12.5 12.2V7Z" fill="#666"/>
+                        </svg>
+                        北京时间：
+                    </span>
+                </div>
+                <div class="time-add">添加时间范围</div>
+            </div>
+        </div>
+
+        <!-- 触发条件 -->
+        <div class="form-item">
+            <label class="form-label">触发条件:</label>
+            <div class="form-content trigger-condition">
+                <div class="condition-top">
+                    <select class="trigger-select">
+                        <option>自然日</option>
+                    </select>
+                    <span style="margin-left: 8px; font-size: 14px; color: #333;">并满足以下判断条件时触发操作</span>
+                </div>
+
+                <!-- 第一组条件 -->
+                <div class="condition-row">
+                    <select class="select-box">
+                        <option>CPI</option>
+                    </select>
+                    <input type="text" class="time-select" placeholder="请选择时间">
+                    <select class="operator-select">
+                        <option>分钟</option>
+                    </select>
+                    <select class="operator-select">
+                        <option>></option>
+                    </select>
+                    <input type="text" class="value-input" placeholder="请输入">
+                    <button class="btn-del">-</button>
+                    <span class="delete-text">删除</span>
+                </div>
+                <div class="condition-row">
+                    <select class="select-box">
+                        <option>老达标率</option>
+                    </select>
+                    <input type="text" class="time-select" placeholder="请选择时间">
+                    <select class="operator-select">
+                        <option>分钟</option>
+                    </select>
+                    <select class="operator-select">
+                        <option>></option>
+                    </select>
+                    <div class="percent-input">
+                        <input type="text" class="value-input" placeholder="请输入">
+                        <span class="percent-symbol">%</span>
+                    </div>
+                    <button class="btn-add">+</button>
+                    <button class="btn-del">-</button>
+                </div>
+
+                <div class="or-line">或者</div>
+
+                <!-- 第二组条件 -->
+                <div class="condition-row">
+                    <select class="select-box">
+                        <option>CPI</option>
+                    </select>
+                    <input type="text" class="time-select" placeholder="请选择时间">
+                    <select class="operator-select">
+                        <option>分钟</option>
+                    </select>
+                    <select class="operator-select">
+                        <option>></option>
+                    </select>
+                    <input type="text" class="value-input" placeholder="请输入">
+                    <button class="btn-add">+</button>
+                    <span class="delete-text">删除</span>
+                </div>
+
+                <button class="add-or-btn">+ 或者</button>
+            </div>
+        </div>
+
+        <!-- 炸量信号 -->
+        <div class="form-item">
+            <label class="form-label">炸量信号:</label>
+            <div class="form-content">
+                <select class="trigger-select">
+                    <option>是</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 触发操作 -->
+        <div class="form-item">
+            <label class="form-label"><span>*</span>触发操作:</label>
+            <div class="form-content">
+                <div class="action-group">
+                    <button class="action-btn active">发送警告</button>
+                    <button class="action-btn">关停计划</button>
+                    <button class="action-btn">开启计划</button>
+                    <button class="action-btn">调整预算</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 警告方式 -->
+        <div class="form-item">
+            <label class="form-label">警告方式:</label>
+            <div class="form-content">
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" name="warningWay" id="feishu" checked>
+                        <label for="feishu">飞书</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 警告频率 -->
+        <div class="form-item">
+            <label class="form-label">警告频率:</label>
+            <div class="form-content">
+                <div class="frequency-input">
+                    <input type="text" value="60">
+                    <span>分钟提醒一次</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 警告范围 -->
+        <div class="form-item">
+            <label class="form-label"><span>*</span>警告范围:</label>
+            <div class="form-content">
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="self" checked>
+                        <label for="self">本人</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="leader">
+                        <label for="leader">上级</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="footer-buttons">
+            <button class="footer-btn cancel-btn">取消</button>
+            <button class="footer-btn save-btn">保存</button>
+        </div>
+    </div>
+    <script>
+    // ========== 1. 状态切换 ==========
+    document.querySelectorAll('.status-group').forEach(group => {
+        group.addEventListener('click', e => {
+            const btn = e.target.closest('.status-btn');
+            if (!btn) return;
+            group.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // ========== 2. Tab 切换 ==========
+    document.querySelectorAll('.tab-group').forEach(group => {
+        group.addEventListener('click', e => {
+            const btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // ========== 2.5 批量搜索切换 ==========
+    document.querySelector('.batch-toggle')?.addEventListener('click', function() {
+        const searchBar = this.parentElement.querySelector('.search-bar');
+        const batchArea = this.parentElement.querySelector('.batch-area');
+        const normalInput = searchBar.querySelector('.search-input');
+        if (batchArea.style.display === 'none') {
+            batchArea.style.display = 'flex';
+            searchBar.style.display = 'none';
+            this.textContent = '普通搜索';
+        } else {
+            batchArea.style.display = 'none';
+            searchBar.style.display = 'flex';
+            this.textContent = '批量搜索';
+            // 切回时把 textarea 第一行带入 input
+            const textarea = batchArea.querySelector('textarea');
+            const firstLine = textarea.value.split(/[\n,]+/)[0]?.trim() || '';
+            normalInput.value = firstLine;
+        }
+    });
+
+    // ========== 3. 触发条件管理 ==========
+    const condContainer = document.querySelector('.trigger-condition');
+
+    function createConditionRow() {
+        const row = document.createElement('div');
+        row.className = 'condition-row';
+        row.innerHTML = `
+            <select class="select-box">
+                <option>CPI</option><option>老达标率</option><option>新达标率</option>
+                <option>ROI</option><option>消耗</option><option>展示</option>
+            </select>
+            <input type="text" class="time-select" placeholder="请选择时间">
+            <select class="operator-select"><option>分钟</option><option>小时</option></select>
+            <select class="operator-select"><option>></option><option><</option><option>=</option><option>>=</option><option><=</option></select>
+            <input type="text" class="value-input" placeholder="请输入">
+            <button class="btn-add">+</button>
+            <button class="btn-del">-</button>
+        `;
+        return row;
+    }
+
+    condContainer.addEventListener('click', e => {
+        const btnAdd = e.target.closest('.btn-add');
+        const btnDel = e.target.closest('.btn-del');
+        const delText = e.target.closest('.delete-text');
+        const addOr = e.target.closest('.add-or-btn');
+
+        // "+" on a row: clone and insert after
+        if (btnAdd && btnAdd.closest('.condition-row')) {
+            const row = btnAdd.closest('.condition-row');
+            const clone = row.cloneNode(true);
+            clone.querySelectorAll('input').forEach(inp => { inp.value = ''; });
+            row.after(clone);
+            return;
+        }
+
+        // "-" or "删除": remove the row
+        if (btnDel || delText) {
+            const row = (btnDel || delText).closest('.condition-row');
+            const prevOr = row.previousElementSibling;
+            const nextOr = row.nextElementSibling;
+            const isPrevOr = prevOr && prevOr.classList.contains('or-line');
+            const isNextOr = nextOr && nextOr.classList.contains('or-line');
+
+            // Count siblings in this group
+            let groupRows = [row];
+            // Look backward for siblings until or-line or condition-top
+            let sib = row.previousElementSibling;
+            while (sib && !sib.classList.contains('or-line') && !sib.classList.contains('condition-top') && !sib.classList.contains('add-or-btn')) {
+                if (sib.classList.contains('condition-row')) groupRows.unshift(sib);
+                sib = sib.previousElementSibling;
+            }
+            sib = row.nextElementSibling;
+            while (sib && !sib.classList.contains('or-line') && !sib.classList.contains('add-or-btn')) {
+                if (sib.classList.contains('condition-row')) groupRows.push(sib);
+                sib = sib.nextElementSibling;
+            }
+
+            if (groupRows.length <= 1) {
+                // Last row in group: remove group separator too
+                if (isPrevOr) prevOr.remove();      // or-line above this group
+                else if (isNextOr) nextOr.remove(); // or-line below (first group case)
+            }
+            row.remove();
+            return;
+        }
+
+        // "+ 或者": add new OR group
+        if (addOr) {
+            const orLine = document.createElement('div');
+            orLine.className = 'or-line';
+            orLine.textContent = '或者';
+            const newRow = createConditionRow();
+            addOr.before(orLine);
+            addOr.before(newRow);
+        }
+    });
+
+    // ========== 4. 触发操作按钮 ==========
+    document.querySelectorAll('.action-group').forEach(group => {
+        group.addEventListener('click', e => {
+            const btn = e.target.closest('.action-btn');
+            if (!btn) return;
+            group.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // ========== 5. 左表选入右表（账户/短剧/推广链接） ==========
+    function updateEmptyState(tbody, table) {
+        const dataRows = tbody.querySelectorAll('tr:not(.empty-state-row)');
+        let emptyRow = tbody.querySelector('.empty-state-row');
+        if (dataRows.length === 0) {
+            if (!emptyRow) {
+                const colspan = table.querySelector('thead th') ? table.querySelectorAll('thead th').length : 3;
+                emptyRow = document.createElement('tr');
+                emptyRow.className = 'empty-state-row';
+                emptyRow.innerHTML = '<td colspan="' + colspan + '"><div class="empty-state"><div class="icon">📭</div><div>暂无数据</div></div></td>';
+                tbody.appendChild(emptyRow);
+            }
+        } else {
+            if (emptyRow) emptyRow.remove();
+        }
+    }
+
+    document.querySelectorAll('.table-container').forEach(container => {
+        const leftWrap = container.querySelector('.table-wrapper');
+        const rightWrap = container.querySelector('.selected-wrapper');
+        if (!leftWrap || !rightWrap) return;
+        const leftTable = leftWrap.querySelector('table');
+        const rightTable = rightWrap.querySelector('table');
+        const rightTbody = rightTable.querySelector('tbody');
+        const rightCols = rightTable.querySelectorAll('thead th').length - 1; // minus 操作
+        const leftTbody = leftTable.querySelector('tbody');
+
+        // Clear pre-existing data rows, rebuild from checkbox state
+        rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(r => r.remove());
+
+        // Left checkbox changes
+        leftTable.addEventListener('change', e => {
+            if (e.target.type !== 'checkbox') return;
+            const leftRow = e.target.closest('tr');
+            if (!leftRow) return;
+            const rowIdx = [...leftTbody.querySelectorAll('tr')].indexOf(leftRow);
+
+            if (e.target.checked) {
+                const data = [...leftRow.querySelectorAll('td')].slice(1).map(td => td.textContent.trim()).slice(0, rightCols);
+                const tr = document.createElement('tr');
+                data.forEach(t => { const td = document.createElement('td'); td.textContent = t; tr.appendChild(td); });
+                // Fill remaining data cols if needed
+                while (tr.querySelectorAll('td').length < rightCols) {
+                    const td = document.createElement('td'); tr.appendChild(td);
+                }
+                const act = document.createElement('td');
+                act.innerHTML = '<button class="delete-btn">🗑</button>';
+                tr.appendChild(act);
+                tr.dataset.leftIdx = rowIdx;
+                rightTbody.appendChild(tr);
+                leftRow.classList.add('row-selected');
+            } else {
+                const tr = rightTbody.querySelector('tr[data-left-idx="' + rowIdx + '"]');
+                if (tr) tr.remove();
+                leftRow.classList.remove('row-selected');
+            }
+            updateEmptyState(rightTbody, rightTable);
+        });
+
+        // Right-side delete button
+        rightTable.addEventListener('click', e => {
+            const del = e.target.closest('.delete-btn');
+            if (!del) return;
+            const tr = del.closest('tr');
+            const idx = tr.dataset.leftIdx;
+            if (idx !== undefined) {
+                const leftRows = [...leftTbody.querySelectorAll('tr')];
+                if (leftRows[idx]) {
+                    leftRows[idx].querySelector('input[type="checkbox"]').checked = false;
+                    leftRows[idx].classList.remove('row-selected');
+                }
+            }
+            tr.remove();
+            updateEmptyState(rightTbody, rightTable);
+        });
+
+        // Clear all
+        const clearLink = rightWrap.querySelector('.clear-all a');
+        if (clearLink) {
+            clearLink.addEventListener('click', e => {
+                e.preventDefault();
+                leftTbody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                    cb.closest('tr').classList.remove('row-selected');
+                });
+                rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(r => r.remove());
+                updateEmptyState(rightTbody, rightTable);
+            });
+        }
+
+        // Initial sync
+        leftTbody.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            cb.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    });
+
+    // ========== 6. 部门树选择 ==========
+    (function() {
+        const allDept = document.getElementById('all-dept');
+        const deptRoot = document.getElementById('dept-root');
+        // Children of 投放部门
+        const deptChildren = ['dept1-1','dept1-2','dept1-3','dept1-4','dept1-5','dept1-6','dept1-7'].map(id => document.getElementById(id));
+        // Root-level departments (海外素材*)
+        const otherDepts = ['dept2-1','dept2-2','dept2-3','dept2-4','dept2-5','dept2-6'].map(id => document.getElementById(id));
+        const allDepts = [...deptChildren, ...otherDepts];
+
+        // Right panel elements
+        const deptFormItem = allDept.closest('.form-item');
+        const rightPanel = deptFormItem.querySelector('.selected-wrapper');
+        const counterSpan = rightPanel.querySelector('span');
+        const clearLink = rightPanel.querySelector('a');
+        const cardContainer = rightPanel.querySelector('div[style*="flex-direction: column"]');
+
+        function getCheckedLeaves() {
+            return allDepts.filter(cb => cb.checked);
+        }
+
+        function updateParentState() {
+            const childChecked = deptChildren.filter(cb => cb.checked).length;
+            if (childChecked === 0) {
+                deptRoot.checked = false;
+                deptRoot.indeterminate = false;
+            } else if (childChecked === deptChildren.length) {
+                deptRoot.checked = true;
+                deptRoot.indeterminate = false;
+            } else {
+                deptRoot.checked = false;
+                deptRoot.indeterminate = true;
+            }
+            // All-dept state
+            const totalChecked = allDepts.filter(cb => cb.checked).length;
+            if (totalChecked === 0) {
+                allDept.checked = false;
+                allDept.indeterminate = false;
+            } else if (totalChecked === allDepts.length) {
+                allDept.checked = true;
+                allDept.indeterminate = false;
+            } else {
+                allDept.checked = false;
+                allDept.indeterminate = true;
+            }
+        }
+
+        function rebuildCards() {
+            const checked = getCheckedLeaves();
+            const labels = checked.map(cb => {
+                const label = document.querySelector('label[for="' + cb.id + '"]');
+                return label ? label.textContent : cb.id;
+            });
+            // Also collect parent labels for checked children
+            const parentLabels = [];
+            if (deptChildren.some(cb => cb.checked) && deptRoot.checked) {
+                parentLabels.unshift('投放部门');
+            } else if (deptChildren.some(cb => cb.checked)) {
+                // Some children checked but not all - still show parent
+                parentLabels.unshift('投放部门');
+            }
+            // Show individual checked items
+            const allLabels = [...parentLabels, ...labels];
+
+            cardContainer.innerHTML = '';
+            allLabels.forEach(name => {
+                const card = document.createElement('div');
+                card.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#fff9e6;border-left:3px solid #ffc107;border-radius:2px;';
+                card.innerHTML = '<span>' + name + '</span><button style="background:none;border:none;cursor:pointer;color:#999;font-size:16px;line-height:1;">×</button>';
+
+                // Click × to uncheck
+                card.querySelector('button').addEventListener('click', () => {
+                    // Find and uncheck the matching checkbox
+                    const targetCb = allDepts.find(cb => {
+                        const label = document.querySelector('label[for="' + cb.id + '"]');
+                        return label && label.textContent === name;
+                    });
+                    if (targetCb) {
+                        targetCb.checked = false;
+                    }
+                    if (name === '投放部门') {
+                        deptChildren.forEach(cb => { cb.checked = false; });
+                    }
+                    updateParentState();
+                    rebuildCards();
+                });
+                cardContainer.appendChild(card);
+            });
+
+            // Update counter
+            const count = checked.length;
+            counterSpan.textContent = '已选0人员 ' + count + '部门';
+        }
+
+        // All-dept toggle
+        allDept.addEventListener('change', () => {
+            const val = allDept.checked;
+            allDepts.forEach(cb => { cb.checked = val; });
+            deptRoot.checked = val;
+            deptRoot.indeterminate = false;
+            allDept.indeterminate = false;
+            rebuildCards();
+        });
+
+        // 投放部门 toggle
+        deptRoot.addEventListener('change', () => {
+            const val = deptRoot.checked;
+            deptChildren.forEach(cb => { cb.checked = val; });
+            deptRoot.indeterminate = false;
+            updateParentState();
+            rebuildCards();
+        });
+
+        // Individual dept toggle
+        allDepts.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateParentState();
+                rebuildCards();
+            });
+        });
+
+        // Clear all
+        clearLink.addEventListener('click', e => {
+            e.preventDefault();
+            allDepts.forEach(cb => { cb.checked = false; });
+            deptRoot.checked = false;
+            deptRoot.indeterminate = false;
+            allDept.checked = false;
+            allDept.indeterminate = false;
+            rebuildCards();
+        });
+
+        // Initial state
+        updateParentState();
+        rebuildCards();
+    })();
+
+    // ========== 7. 保存 -- 收集表单数据 ==========
+    document.querySelector('.save-btn').addEventListener('click', () => {
+        const data = {};
+
+        // 基本信息
+        data.name = document.querySelector('#name') ? document.querySelector('#name').value : '';
+        data.status = document.querySelector('.status-btn.active')?.textContent || '';
+
+        // 生效时间
+        const timeInputs = document.querySelectorAll('.time-range .time-input');
+        data.effectiveStart = timeInputs[0]?.value || '';
+        data.effectiveEnd = timeInputs[1]?.value || '';
+
+        // 触发条件
+        data.triggerConditions = [];
+        let currentGroup = [];
+        const condContainer = document.querySelector('.trigger-condition');
+        for (const node of condContainer.children) {
+            if (node.classList.contains('condition-row')) {
+                const selects = node.querySelectorAll('select');
+                const inputs = node.querySelectorAll('input[type="text"]');
+                currentGroup.push({
+                    metric: selects[0]?.value || '',
+                    timeRange: inputs[0]?.value || '',
+                    timeUnit: selects[1]?.value || '',
+                    operator: selects[2]?.value || '',
+                    value: inputs[1]?.value || '',
+                    isPercent: node.querySelector('.percent-symbol') !== null
+                });
+            } else if (node.classList.contains('or-line')) {
+                if (currentGroup.length) data.triggerConditions.push(currentGroup);
+                currentGroup = [];
+            }
+        }
+        if (currentGroup.length) data.triggerConditions.push(currentGroup);
+
+        // 炸量信号
+        const sigSelect = document.querySelectorAll('.trigger-select')[1];
+        data.explosionSignal = sigSelect?.value || '';
+
+        // 触发操作
+        data.triggerAction = document.querySelector('.action-btn.active')?.textContent || '';
+
+        // 警告方式
+        const checkedRadio = document.querySelector('input[name="warningWay"]:checked');
+        data.warningMethod = checkedRadio ? document.querySelector('label[for="' + checkedRadio.id + '"]')?.textContent : '';
+
+        // 警告频率
+        data.warningFrequency = document.querySelector('.frequency-input input')?.value || '';
+
+        // 警告范围
+        const scopeCbs = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+        data.warningScope = [...scopeCbs].filter(cb => cb.checked).map(cb => {
+            const label = document.querySelector('label[for="' + cb.id + '"]');
+            return label?.textContent || '';
+        });
+
+        // 控损对象 - 时区
+        const timezoneSelect = document.querySelector('.form-item:nth-of-type(3) .input-box') ||
+            document.querySelector('.section-title + .form-item .input-box');
+        // Find by content: the select right after 控损对象 section title
+        const objTitle = [...document.querySelectorAll('.section-title')].find(el => el.textContent === '控损对象');
+        if (objTitle) {
+            const nextFormItem = objTitle.nextElementSibling;
+            if (nextFormItem && nextFormItem.classList.contains('form-item')) {
+                data.timezone = nextFormItem.querySelector('select')?.value || '';
+            }
+        }
+
+        // 账户范围 - selected rows
+        data.accounts = [];
+        const accountContainers = document.querySelectorAll('.table-container');
+        // First table-container is 账户范围
+        if (accountContainers[0]) {
+            const rightTbody = accountContainers[0].querySelector('.selected-wrapper tbody');
+            rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 2) {
+                    data.accounts.push({ name: tds[0].textContent, id: tds[1].textContent });
+                }
+            });
+        }
+
+        // 短剧范围
+        data.appType = document.querySelectorAll('.input-box')[1]?.value || '';
+        const langTags = document.querySelectorAll('.tag-group:first-of-type .tag');
+        data.languages = [...langTags].map(t => t.textContent.replace(/×/, '').trim());
+        data.businessType = document.querySelectorAll('.input-box')[2]?.value || '';
+        const channelTag = document.querySelectorAll('.tag-group')[1]?.querySelector('.tag');
+        data.channelName = channelTag ? channelTag.textContent.replace(/×/, '').trim() : '';
+        data.dramas = [];
+        if (accountContainers[1]) {
+            const rightTbody = accountContainers[1].querySelector('.selected-wrapper tbody');
+            rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 2) {
+                    data.dramas.push({ scriptName: tds[0]?.textContent || '', language: tds[1]?.textContent || '' });
+                }
+            });
+        }
+
+        // 用户范围
+        data.departments = [];
+        document.querySelectorAll('#dept1-1,#dept1-2,#dept1-3,#dept1-4,#dept1-5,#dept1-6,#dept1-7,#dept2-1,#dept2-2,#dept2-3,#dept2-4,#dept2-5,#dept2-6').forEach(cb => {
+            if (cb.checked) {
+                const label = document.querySelector('label[for="' + cb.id + '"]');
+                data.departments.push(label?.textContent || cb.id);
+            }
+        });
+
+        // 推广链接
+        data.promotionLinks = [];
+        if (accountContainers[2]) {
+            const rightTbody = accountContainers[2].querySelector('.selected-wrapper tbody');
+            rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 2) {
+                    data.promotionLinks.push({ name: tds[0].textContent, id: tds[1].textContent });
+                }
+            });
+        }
+
+        console.log('表单数据:', JSON.stringify(data, null, 2));
+        alert('数据已输出到控制台 (F12 → Console)');
+    });
+    </script>
+</body>
+</html>
