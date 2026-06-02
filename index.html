@@ -137,6 +137,32 @@
             border-radius: 0;
             border-left: none;
         }
+        .drama-search-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .drama-search-row .search-dim {
+            flex-shrink: 0;
+        }
+        .drama-search-row .search-bar {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .drama-search-row .search-bar .search-input {
+            border-radius: 0;
+            border-left: none;
+            flex: 1;
+            width: auto;
+        }
+        .drama-search-row .batch-area {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .drama-search-row .batch-area .batch-textarea {
+            border-radius: 0;
+            border-left: none;
+        }
         .search-icon {
             border: 1px solid #d9d9d9;
             border-left: none;
@@ -504,7 +530,7 @@
     <div class="container">
         <div class="header">
             <a href="#" class="back-btn">&lt; 返回</a>
-            <h2 style="font-size: 16px; font-weight: 500;">创建[FB]规则控损</h2>
+            <h2 id="pageTitle" style="font-size: 16px; font-weight: 500;">创建[FB]规则控损</h2>
         </div>
 
         <!-- 基本信息 -->
@@ -545,7 +571,7 @@
                     <button class="search-btn">搜索</button>
                 </div>
 
-                <div class="table-container">
+                <div class="table-container" id="accountTableContainer">
                     <!-- 左侧账户列表 -->
                     <div class="table-wrapper">
                         <table>
@@ -556,43 +582,7 @@
                                     <th>账户ID</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr class="row-selected">
-                                    <td><input type="checkbox" checked></td>
-                                    <td>FB-MAD-NS- FHH-西五-M13-0410-3</td>
-                                    <td>25801740262838890</td>
-                                </tr>
-                                <tr class="row-selected">
-                                    <td><input type="checkbox" checked></td>
-                                    <td>FB-MAD-NS- FHH-西五-M13-0410-2</td>
-                                    <td>1041381905512320</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>FB-MAD-NS- FHH-西五-M13-0410-4</td>
-                                    <td>808685111836004</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>FB-MAD-NS-XK-MGUO-TC/MY/JP/KR-曼东</td>
-                                    <td>961626380183600</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>FB-MAD-NS-XK-MGUO-VN/ID/IN-曼东</td>
-                                    <td>1302826464614071</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>FB-MAD-NS-XK-MGUO-AR/TR/TH-曼东</td>
-                                    <td>1297590561880005</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>FB-MAD-XK-东八区-TC/MY/JP/KR-曼东</td>
-                                    <td>1492033395950640</td>
-                                </tr>
-                            </tbody>
+                            <tbody id="accountTbody"></tbody>
                         </table>
                         <div class="pagination" style="padding: 10px;">
                             <button class="page-btn">&lt;</button>
@@ -644,8 +634,9 @@
         <!-- 短剧范围 -->
         <div class="form-item">
             <label class="form-label" style="padding-top: 0;"><span>*</span>app类型:</label>
-            <select class="input-box">
-                <option>NetShort</option>
+            <select id="appType" class="input-box">
+                <option value="fb">NetShort</option>
+                <option value="tt">TikTok小程序</option>
             </select>
         </div>
         <div class="form-item">
@@ -661,7 +652,7 @@
                 <option>全部</option>
             </select>
         </div>
-        <div class="form-item">
+        <div class="form-item" id="channelFormItem">
             <label class="form-label">渠道号名称:</label>
             <div class="tag-group">
                 <span class="tag">NASCUAAAAB-(收费)-ns投放SC新像素测试渠道通用 <span class="close">×</span></span>
@@ -675,15 +666,22 @@
                     <button class="tab-btn active">部分</button>
                     <button class="tab-btn">排除</button>
                 </div>
-                <div class="search-bar">
-                    <select class="search-dim">
+                <div class="drama-search-row">
+                    <select class="search-dim" id="dramaSearchDim">
                         <option value="drama_name">短剧名称</option>
                         <option value="script_id">剧本编号</option>
                         <option value="script_name">剧本名称</option>
                     </select>
-                    <input type="text" class="search-input" placeholder="请输入短剧名称">
-                    <button class="search-btn">搜索</button>
+                    <div class="search-bar drama-search-bar">
+                        <input type="text" class="search-input" placeholder="请输入短剧名称">
+                        <button class="search-btn">搜索</button>
+                    </div>
+                    <div class="batch-area drama-batch-area" style="display:none;">
+                        <textarea class="batch-textarea" rows="3" placeholder="每行一个，支持输入短剧名称批量搜索"></textarea>
+                        <button class="search-btn">搜索</button>
+                    </div>
                 </div>
+                <span class="batch-toggle" id="dramaBatchToggle">批量搜索</span>
 
                 <div class="table-container">
                     <!-- 左侧短剧列表 -->
@@ -892,8 +890,8 @@
                     <textarea class="batch-textarea" rows="3" placeholder="每行一个，支持输入链接ID批量搜索"></textarea>
                     <button class="search-btn" style="margin-left:0;">搜索</button>
                 </div>
-                <span class="batch-toggle">批量搜索</span>
-                <div class="table-container">
+                <span class="batch-toggle" id="linkBatchToggle">批量搜索</span>
+                <div class="table-container" id="linkTableContainer">
                     <!-- 左侧监测链接列表 -->
                     <div class="table-wrapper">
                         <table>
@@ -904,43 +902,7 @@
                                     <th>链接ID</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059214674490560513-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-WT</td>
-                                    <td>2059214674490560513</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059271375637975042-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-JZ</td>
-                                    <td>2059271375637975042</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059271366024634369-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-JZ</td>
-                                    <td>2059271366024634369</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059212498196242434-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-XTING</td>
-                                    <td>2059212498196242434</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059180016855945218-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST</td>
-                                    <td>2059180016855945218</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059187420557479937-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ</td>
-                                    <td>2059187420557479937</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>2059160285495169025-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN</td>
-                                    <td>2059160285495169025</td>
-                                </tr>
-                            </tbody>
+                            <tbody id="linkTbody"></tbody>
                         </table>
                         <div class="pagination" style="padding: 10px;">
                             <span style="margin-right: 10px;">共 3352954 项</span>
@@ -1012,7 +974,7 @@
         <!-- 触发条件 -->
         <div class="form-item">
             <label class="form-label">触发条件:</label>
-            <div class="form-content trigger-condition">
+            <div class="form-content trigger-condition" id="triggerCondition">
                 <div class="condition-top">
                     <select class="trigger-select">
                         <option>自然日</option>
@@ -1022,9 +984,7 @@
 
                 <!-- 第一组条件 -->
                 <div class="condition-row">
-                    <select class="select-box">
-                        <option>CPI</option>
-                    </select>
+                    <select class="select-box metric-select"></select>
                     <input type="text" class="time-select" placeholder="请选择时间">
                     <select class="operator-select">
                         <option>分钟</option>
@@ -1037,9 +997,7 @@
                     <span class="delete-text">删除</span>
                 </div>
                 <div class="condition-row">
-                    <select class="select-box">
-                        <option>老达标率</option>
-                    </select>
+                    <select class="select-box metric-select"></select>
                     <input type="text" class="time-select" placeholder="请选择时间">
                     <select class="operator-select">
                         <option>分钟</option>
@@ -1059,9 +1017,7 @@
 
                 <!-- 第二组条件 -->
                 <div class="condition-row">
-                    <select class="select-box">
-                        <option>CPI</option>
-                    </select>
+                    <select class="select-box metric-select"></select>
                     <input type="text" class="time-select" placeholder="请选择时间">
                     <select class="operator-select">
                         <option>分钟</option>
@@ -1149,6 +1105,106 @@
         </div>
     </div>
     <script>
+    // ========== 0. App 类型配置 ==========
+    const APP_TYPE_CONFIG = {
+        fb: {
+            label: 'FB',
+            metrics: ['CPI', '老达标率', '新达标率', 'ROI', '消耗', '展示'],
+            showChannel: true,
+            accounts: [
+                { name: 'FB-MAD-NS- FHH-西五-M13-0410-3', id: '25801740262838890' },
+                { name: 'FB-MAD-NS- FHH-西五-M13-0410-2', id: '1041381905512320' },
+                { name: 'FB-MAD-NS- FHH-西五-M13-0410-4', id: '808685111836004' },
+                { name: 'FB-MAD-NS-XK-MGUO-TC/MY/JP/KR-曼东', id: '961626380183600' },
+                { name: 'FB-MAD-NS-XK-MGUO-VN/ID/IN-曼东', id: '1302826464614071' },
+                { name: 'FB-MAD-NS-XK-MGUO-AR/TR/TH-曼东', id: '1297590561880005' },
+                { name: 'FB-MAD-XK-东八区-TC/MY/JP/KR-曼东', id: '1492033395950640' }
+            ],
+            links: [
+                { name: '2059214674490560513-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-WT', id: '2059214674490560513' },
+                { name: '2059271375637975042-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-JZ', id: '2059271375637975042' },
+                { name: '2059271366024634369-PA263-FB-0526-(AI Dubbed)病区晚风-US-w2a-JZ', id: '2059271366024634369' },
+                { name: '2059212498196242434-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-XTING', id: '2059212498196242434' },
+                { name: '2059180016855945218-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST', id: '2059180016855945218' },
+                { name: '2059187420557479937-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ', id: '2059187420557479937' },
+                { name: '2059160285495169025-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN', id: '2059160285495169025' }
+            ]
+        },
+        tt: {
+            label: 'TT',
+            metrics: ['消耗', 'ROI', '付费总数', '展示数', '点击数', '付费成本', 'ECPM', 'CPM', 'CTR'],
+            showChannel: false,
+            accounts: [
+                { name: 'TT-MAD-NS- FHH-西五-M13-0410-3', id: '35801740262838891' },
+                { name: 'TT-MAD-NS- FHH-西五-M13-0410-2', id: '2041381905512321' },
+                { name: 'TT-MAD-NS- FHH-西五-M13-0410-4', id: '9086851118360042' },
+                { name: 'TT-MAD-NS-XK-MGUO-TC/MY/JP/KR-曼东', id: '9616263801836011' },
+                { name: 'TT-MAD-NS-XK-MGUO-VN/ID/IN-曼东', id: '2302826464614072' },
+                { name: 'TT-MAD-NS-XK-MGUO-AR/TR/TH-曼东', id: '2297590561880006' },
+                { name: 'TT-MAD-XK-东八区-TC/MY/JP/KR-曼东', id: '2492033395950641' }
+            ],
+            links: [
+                { name: '3059214674490560513-PA263-TT-0526-(AI Dubbed)病区晚风-US-w2a-WT', id: '3059214674490560513' },
+                { name: '3059271375637975042-PA263-TT-0526-(AI Dubbed)病区晚风-US-w2a-JZ', id: '3059271375637975042' },
+                { name: '3059271366024634369-PA263-TT-0526-(AI Dubbed)病区晚风-US-w2a-JZ', id: '3059271366024634369' },
+                { name: '3059212498196242434-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-XTING', id: '3059212498196242434' },
+                { name: '3059180016855945218-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST', id: '3059180016855945218' },
+                { name: '3059187420557479937-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ', id: '3059187420557479937' },
+                { name: '3059160285495169025-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN', id: '3059160285495169025' }
+            ]
+        }
+    };
+
+    function renderAccountTable(accounts) {
+        const tbody = document.getElementById('accountTbody');
+        tbody.innerHTML = accounts.map((acc, i) => {
+            const checked = i < 2 ? ' checked' : '';
+            const rowClass = i < 2 ? ' class="row-selected"' : '';
+            return `<tr${rowClass}>
+                <td><input type="checkbox"${checked}></td>
+                <td>${acc.name}</td>
+                <td>${acc.id}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    function renderLinkTable(links) {
+        const tbody = document.getElementById('linkTbody');
+        tbody.innerHTML = links.map(link =>
+            `<tr>
+                <td><input type="checkbox"></td>
+                <td>${link.name}</td>
+                <td>${link.id}</td>
+            </tr>`
+        ).join('');
+    }
+
+    function renderMetricSelects(metrics) {
+        const optionsHtml = metrics.map(m => `<option>${m}</option>`).join('');
+        document.querySelectorAll('.metric-select').forEach(sel => { sel.innerHTML = optionsHtml; });
+    }
+
+    function onAppTypeChange() {
+        const config = APP_TYPE_CONFIG[appTypeSelect.value];
+        document.getElementById('pageTitle').textContent = `创建[${config.label}]规则控损`;
+        document.getElementById('channelFormItem').style.display = config.showChannel ? '' : 'none';
+        renderAccountTable(config.accounts);
+        renderLinkTable(config.links);
+        renderMetricSelects(config.metrics);
+    }
+
+    const appTypeSelect = document.getElementById('appType');
+    appTypeSelect.addEventListener('change', onAppTypeChange);
+
+    // 初始化
+    (() => {
+        const config = APP_TYPE_CONFIG.fb;
+        document.getElementById('pageTitle').textContent = `创建[${config.label}]规则控损`;
+        renderAccountTable(config.accounts);
+        renderLinkTable(config.links);
+        renderMetricSelects(config.metrics);
+    })();
+
     // ========== 1. 状态切换 ==========
     document.querySelectorAll('.status-group').forEach(group => {
         group.addEventListener('click', e => {
@@ -1169,8 +1225,8 @@
         });
     });
 
-    // ========== 2.5 批量搜索切换 ==========
-    document.querySelector('.batch-toggle')?.addEventListener('click', function() {
+    // ========== 2.5 批量搜索切换（推广链接） ==========
+    document.getElementById('linkBatchToggle')?.addEventListener('click', function() {
         const searchBar = this.parentElement.querySelector('.search-bar');
         const batchArea = this.parentElement.querySelector('.batch-area');
         const normalInput = searchBar.querySelector('.search-input');
@@ -1190,27 +1246,50 @@
     });
 
     // ========== 2.6 短剧搜索维度切换 ==========
-    document.querySelector('.search-dim')?.addEventListener('change', function() {
-        const input = this.nextElementSibling;
+    document.getElementById('dramaSearchDim')?.addEventListener('change', function() {
+        const row = this.closest('.drama-search-row');
+        const input = row?.querySelector('.search-input');
+        const textarea = row?.querySelector('.batch-textarea');
         const map = {
-            drama_name: '请输入短剧名称',
-            script_id: '请输入剧本编号',
-            script_name: '请输入剧本名称'
+            drama_name: { input: '请输入短剧名称', batch: '每行一个，支持输入短剧名称批量搜索' },
+            script_id: { input: '请输入剧本编号', batch: '每行一个，支持输入剧本编号批量搜索' },
+            script_name: { input: '请输入剧本名称', batch: '每行一个，支持输入剧本名称批量搜索' }
         };
-        input.placeholder = map[this.value] || '';
+        const m = map[this.value] || {};
+        if (input) input.placeholder = m.input || '';
+        if (textarea) textarea.placeholder = m.batch || '';
+    });
+
+    // ========== 2.7 短剧批量搜索切换 ==========
+    document.getElementById('dramaBatchToggle')?.addEventListener('click', function() {
+        const row = this.previousElementSibling;
+        const searchBar = row.querySelector('.drama-search-bar');
+        const batchArea = row.querySelector('.drama-batch-area');
+        const normalInput = searchBar.querySelector('.search-input');
+        if (batchArea.style.display === 'none') {
+            batchArea.style.display = 'flex';
+            searchBar.style.display = 'none';
+            this.textContent = '普通搜索';
+        } else {
+            batchArea.style.display = 'none';
+            searchBar.style.display = 'flex';
+            this.textContent = '批量搜索';
+            const textarea = batchArea.querySelector('textarea');
+            const firstLine = textarea.value.split(/[\n,]+/)[0]?.trim() || '';
+            normalInput.value = firstLine;
+        }
     });
 
     // ========== 3. 触发条件管理 ==========
-    const condContainer = document.querySelector('.trigger-condition');
+    const condContainer = document.getElementById('triggerCondition');
 
     function createConditionRow() {
+        const metrics = APP_TYPE_CONFIG[appTypeSelect.value].metrics;
+        const optionsHtml = metrics.map(m => `<option>${m}</option>`).join('');
         const row = document.createElement('div');
         row.className = 'condition-row';
         row.innerHTML = `
-            <select class="select-box">
-                <option>CPI</option><option>老达标率</option><option>新达标率</option>
-                <option>ROI</option><option>消耗</option><option>展示</option>
-            </select>
+            <select class="select-box metric-select">${optionsHtml}</select>
             <input type="text" class="time-select" placeholder="请选择时间">
             <select class="operator-select"><option>分钟</option><option>小时</option></select>
             <select class="operator-select"><option>></option><option><</option><option>=</option><option>>=</option><option><=</option></select>
@@ -1540,8 +1619,8 @@
         // 触发条件
         data.triggerConditions = [];
         let currentGroup = [];
-        const condContainer = document.querySelector('.trigger-condition');
-        for (const node of condContainer.children) {
+        const condContainerSave = document.getElementById('triggerCondition');
+        for (const node of condContainerSave.children) {
             if (node.classList.contains('condition-row')) {
                 const selects = node.querySelectorAll('select');
                 const inputs = node.querySelectorAll('input[type="text"]');
@@ -1595,11 +1674,9 @@
 
         // 账户范围 - selected rows
         data.accounts = [];
-        const accountContainers = document.querySelectorAll('.table-container');
-        // First table-container is 账户范围
-        if (accountContainers[0]) {
-            const rightTbody = accountContainers[0].querySelector('.selected-wrapper tbody');
-            rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
+        const accountTbody = document.querySelector('#accountTableContainer .selected-wrapper tbody');
+        if (accountTbody) {
+            accountTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
                 const tds = tr.querySelectorAll('td');
                 if (tds.length >= 2) {
                     data.accounts.push({ name: tds[0].textContent, id: tds[1].textContent });
@@ -1608,15 +1685,19 @@
         }
 
         // 短剧范围
-        data.appType = document.querySelectorAll('.input-box')[1]?.value || '';
+        data.appType = document.getElementById('appType').value;
         const langTags = document.querySelectorAll('.tag-group:first-of-type .tag');
         data.languages = [...langTags].map(t => t.textContent.replace(/×/, '').trim());
         data.businessType = document.querySelectorAll('.input-box')[2]?.value || '';
-        const channelTag = document.querySelectorAll('.tag-group')[1]?.querySelector('.tag');
-        data.channelName = channelTag ? channelTag.textContent.replace(/×/, '').trim() : '';
+        data.channelName = '';
+        if (APP_TYPE_CONFIG[data.appType].showChannel) {
+            const channelTag = document.querySelectorAll('.tag-group')[1]?.querySelector('.tag');
+            data.channelName = channelTag ? channelTag.textContent.replace(/×/, '').trim() : '';
+        }
         data.dramas = [];
-        if (accountContainers[1]) {
-            const rightTbody = accountContainers[1].querySelector('.selected-wrapper tbody');
+        const dramaContainers = document.querySelectorAll('.table-container');
+        if (dramaContainers[1]) {
+            const rightTbody = dramaContainers[1].querySelector('.selected-wrapper tbody');
             rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
                 const tds = tr.querySelectorAll('td');
                 if (tds.length >= 2) {
@@ -1636,9 +1717,9 @@
 
         // 推广链接
         data.promotionLinks = [];
-        if (accountContainers[2]) {
-            const rightTbody = accountContainers[2].querySelector('.selected-wrapper tbody');
-            rightTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
+        const linkTbody = document.querySelector('#linkTableContainer .selected-wrapper tbody');
+        if (linkTbody) {
+            linkTbody.querySelectorAll('tr:not(.empty-state-row)').forEach(tr => {
                 const tds = tr.querySelectorAll('td');
                 if (tds.length >= 2) {
                     data.promotionLinks.push({ name: tds[0].textContent, id: tds[1].textContent });
