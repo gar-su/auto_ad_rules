@@ -501,6 +501,65 @@
             gap: 6px;
             font-size: 14px;
         }
+        /* 小程序下拉多选 */
+        .mp-dropdown {
+            position: relative;
+            width: 350px;
+        }
+        .mp-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #fff;
+            min-height: 34px;
+        }
+        .mp-dropdown-trigger:hover {
+            border-color: #1677ff;
+        }
+        .mp-trigger-text {
+            color: #333;
+        }
+        .mp-trigger-text.placeholder {
+            color: #bfbfbf;
+        }
+        .mp-arrow {
+            font-size: 10px;
+            color: #999;
+        }
+        .mp-dropdown-panel {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.1);
+            z-index: 100;
+            padding: 8px 0;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .mp-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .mp-dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        .mp-dropdown-item input[type="checkbox"] {
+            margin: 0;
+        }
         /* 底部按钮 */
         .footer-buttons {
             display: flex;
@@ -638,6 +697,22 @@
                 <option value="fb">NetShort</option>
                 <option value="tt">TikTok小程序</option>
             </select>
+        </div>
+        <!-- 小程序选择（仅 TikTok小程序 时显示） -->
+        <div class="form-item" id="miniProgramFormItem" style="display:none;">
+            <label class="form-label" style="padding-top: 0;"><span>*</span>小程序选择:</label>
+            <div class="mp-dropdown" id="mpDropdown">
+                <div class="mp-dropdown-trigger" id="mpDropdownTrigger">
+                    <span class="mp-trigger-text">请选择小程序</span>
+                    <span class="mp-arrow">▼</span>
+                </div>
+                <div class="mp-dropdown-panel" id="mpDropdownPanel" style="display:none;">
+                    <label class="mp-dropdown-item">
+                        <input type="checkbox" id="mpSelectAll" checked> <span>全选</span>
+                    </label>
+                    <div id="miniProgramList"></div>
+                </div>
+            </div>
         </div>
         <div class="form-item">
             <label class="form-label"><span>*</span>语种:</label>
@@ -1155,6 +1230,112 @@
         }
     };
 
+    // ========== 0.1 小程序配置（TikTok 渠道下的小程序列表） ==========
+    const MINI_PROGRAMS = [
+        {
+            name: 'TikTok小程序-短剧出海', id: 'mp_001',
+            links: [
+                { name: '3059214674490560513-PA263-TT-0526-(AI Dubbed)病区晚风-US-w2a-WT', id: '3059214674490560513' },
+                { name: '3059271375637975042-PA263-TT-0526-(AI Dubbed)病区晚风-US-w2a-JZ', id: '3059271375637975042' },
+            ]
+        },
+        {
+            name: 'TikTok小程序-网文翻译', id: 'mp_002',
+            links: [
+                { name: '3059271366024634369-PA263-TT-0526-(AI Dubbed)病区晚风-US-w2a-JZ', id: '3059271366024634369' },
+                { name: '3059212498196242434-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-XTING', id: '3059212498196242434' },
+            ]
+        },
+        {
+            name: 'TikTok小程序-互动短剧', id: 'mp_003',
+            links: [
+                { name: '3059180016855945218-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST', id: '3059180016855945218' },
+                { name: '3059187420557479937-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ', id: '3059187420557479937' },
+                { name: '3059160285495169025-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN', id: '3059160285495169025' },
+            ]
+        }
+    ];
+
+    function renderMiniProgramList() {
+        const container = document.getElementById('miniProgramList');
+        container.innerHTML = MINI_PROGRAMS.map(mp =>
+            `<label class="mp-dropdown-item">
+                <input type="checkbox" class="mp-checkbox" data-mp-id="${mp.id}" checked>
+                <span>${mp.name}</span>
+            </label>`
+        ).join('');
+        document.getElementById('mpSelectAll').checked = true;
+        updateMpTriggerText();
+    }
+
+    function updateMpTriggerText() {
+        const checked = document.querySelectorAll('.mp-checkbox:checked');
+        const total = document.querySelectorAll('.mp-checkbox');
+        const textEl = document.querySelector('.mp-trigger-text');
+        if (checked.length === 0) {
+            textEl.textContent = '请选择小程序';
+            textEl.classList.add('placeholder');
+        } else if (checked.length === total.length) {
+            textEl.textContent = '全部';
+            textEl.classList.remove('placeholder');
+        } else {
+            textEl.textContent = `已选 ${checked.length} 项`;
+            textEl.classList.remove('placeholder');
+        }
+    }
+
+    function getSelectedMiniProgramLinks() {
+        const checkedIds = new Set();
+        document.querySelectorAll('.mp-checkbox:checked').forEach(cb => {
+            checkedIds.add(cb.dataset.mpId);
+        });
+        const links = [];
+        MINI_PROGRAMS.forEach(mp => {
+            if (checkedIds.has(mp.id)) {
+                links.push(...mp.links);
+            }
+        });
+        return links;
+    }
+
+    function onMiniProgramChange() {
+        const links = getSelectedMiniProgramLinks();
+        renderLinkTable(links);
+        const allCbs = document.querySelectorAll('.mp-checkbox');
+        const checkedCbs = document.querySelectorAll('.mp-checkbox:checked');
+        document.getElementById('mpSelectAll').checked =
+            allCbs.length > 0 && checkedCbs.length === allCbs.length;
+        updateMpTriggerText();
+    }
+
+    // 小程序下拉开关
+    document.addEventListener('click', e => {
+        const trigger = document.getElementById('mpDropdownTrigger');
+        const panel = document.getElementById('mpDropdownPanel');
+        const dropdown = document.getElementById('mpDropdown');
+        if (!trigger || !panel || !dropdown) return;
+
+        if (trigger.contains(e.target)) {
+            const isOpen = panel.style.display !== 'none';
+            panel.style.display = isOpen ? 'none' : '';
+        } else if (!dropdown.contains(e.target)) {
+            panel.style.display = 'none';
+        }
+    });
+
+    // 小程序选择变更（全选 + 单项）
+    document.addEventListener('change', e => {
+        if (e.target.id === 'mpSelectAll') {
+            document.querySelectorAll('.mp-checkbox').forEach(cb => {
+                cb.checked = e.target.checked;
+            });
+            onMiniProgramChange();
+        }
+        if (e.target.classList.contains('mp-checkbox')) {
+            onMiniProgramChange();
+        }
+    });
+
     function renderAccountTable(accounts) {
         const tbody = document.getElementById('accountTbody');
         tbody.innerHTML = accounts.map((acc, i) => {
@@ -1189,8 +1370,16 @@
         document.getElementById('pageTitle').textContent = `创建[${config.label}]规则控损`;
         document.getElementById('channelFormItem').style.display = config.showChannel ? '' : 'none';
         renderAccountTable(config.accounts);
-        renderLinkTable(config.links);
         renderMetricSelects(config.metrics);
+
+        const isMiniProgram = appTypeSelect.value === 'tt';
+        document.getElementById('miniProgramFormItem').style.display = isMiniProgram ? '' : 'none';
+        if (isMiniProgram) {
+            renderMiniProgramList();
+            renderLinkTable(getSelectedMiniProgramLinks());
+        } else {
+            renderLinkTable(config.links);
+        }
     }
 
     const appTypeSelect = document.getElementById('appType');
@@ -1726,6 +1915,13 @@
                 }
             });
         }
+
+        // 已选小程序
+        data.miniPrograms = [];
+        document.querySelectorAll('.mp-checkbox:checked').forEach(cb => {
+            const mp = MINI_PROGRAMS.find(m => m.id === cb.dataset.mpId);
+            if (mp) data.miniPrograms.push({ name: mp.name, id: mp.id });
+        });
 
         console.log('表单数据:', JSON.stringify(data, null, 2));
         alert('数据已输出到控制台 (F12 → Console)');
