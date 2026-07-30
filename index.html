@@ -501,12 +501,12 @@
             gap: 6px;
             font-size: 14px;
         }
-        /* 小程序下拉多选 */
-        .mp-dropdown {
+        /* 下拉多选（通用） */
+        .multi-dropdown {
             position: relative;
             width: 350px;
         }
-        .mp-dropdown-trigger {
+        .multi-dropdown-trigger {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -518,20 +518,20 @@
             background: #fff;
             min-height: 34px;
         }
-        .mp-dropdown-trigger:hover {
+        .multi-dropdown-trigger:hover {
             border-color: #1677ff;
         }
-        .mp-trigger-text {
+        .multi-trigger-text {
             color: #333;
         }
-        .mp-trigger-text.placeholder {
+        .multi-trigger-text.placeholder {
             color: #bfbfbf;
         }
-        .mp-arrow {
+        .multi-arrow {
             font-size: 10px;
             color: #999;
         }
-        .mp-dropdown-panel {
+        .multi-dropdown-panel {
             position: absolute;
             top: 100%;
             left: 0;
@@ -546,7 +546,7 @@
             max-height: 240px;
             overflow-y: auto;
         }
-        .mp-dropdown-item {
+        .multi-dropdown-item {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -554,10 +554,10 @@
             font-size: 14px;
             cursor: pointer;
         }
-        .mp-dropdown-item:hover {
+        .multi-dropdown-item:hover {
             background: #f5f5f5;
         }
-        .mp-dropdown-item input[type="checkbox"] {
+        .multi-dropdown-item input[type="checkbox"] {
             margin: 0;
         }
         /* 底部按钮 */
@@ -695,19 +695,20 @@
             <label class="form-label" style="padding-top: 0;"><span>*</span>app类型:</label>
             <select id="appType" class="input-box">
                 <option value="fb">NetShort</option>
+                <option value="nt">NetToon</option>
                 <option value="tt">TikTok小程序</option>
             </select>
         </div>
         <!-- 小程序选择（仅 TikTok小程序 时显示） -->
         <div class="form-item" id="miniProgramFormItem" style="display:none;">
             <label class="form-label" style="padding-top: 0;"><span>*</span>小程序选择:</label>
-            <div class="mp-dropdown" id="mpDropdown">
-                <div class="mp-dropdown-trigger" id="mpDropdownTrigger">
-                    <span class="mp-trigger-text">请选择小程序</span>
-                    <span class="mp-arrow">▼</span>
+            <div class="multi-dropdown" id="mpDropdown">
+                <div class="multi-dropdown-trigger" id="mpDropdownTrigger">
+                    <span class="multi-trigger-text">请选择小程序</span>
+                    <span class="multi-arrow">▼</span>
                 </div>
-                <div class="mp-dropdown-panel" id="mpDropdownPanel" style="display:none;">
-                    <label class="mp-dropdown-item">
+                <div class="multi-dropdown-panel" id="mpDropdownPanel" style="display:none;">
+                    <label class="multi-dropdown-item">
                         <input type="checkbox" id="mpSelectAll" checked> <span>全选</span>
                     </label>
                     <div id="miniProgramList"></div>
@@ -716,9 +717,17 @@
         </div>
         <div class="form-item">
             <label class="form-label"><span>*</span>语种:</label>
-            <div class="tag-group">
-                <span class="tag">English <span class="close">×</span></span>
-                <span class="tag">简体中文 <span class="close">×</span></span>
+            <div class="multi-dropdown" id="langDropdown">
+                <div class="multi-dropdown-trigger" id="langDropdownTrigger">
+                    <span class="multi-trigger-text">全部</span>
+                    <span class="multi-arrow">▼</span>
+                </div>
+                <div class="multi-dropdown-panel" id="langDropdownPanel" style="display:none;">
+                    <label class="multi-dropdown-item">
+                        <input type="checkbox" id="langSelectAll" checked> <span>全选</span>
+                    </label>
+                    <div id="langList"></div>
+                </div>
             </div>
         </div>
         <div class="form-item">
@@ -729,8 +738,17 @@
         </div>
         <div class="form-item" id="channelFormItem">
             <label class="form-label">渠道号名称:</label>
-            <div class="tag-group">
-                <span class="tag">NASCUAAAAB-(收费)-ns投放SC新像素测试渠道通用 <span class="close">×</span></span>
+            <div class="multi-dropdown" id="channelDropdown">
+                <div class="multi-dropdown-trigger" id="channelDropdownTrigger">
+                    <span class="multi-trigger-text">全部</span>
+                    <span class="multi-arrow">▼</span>
+                </div>
+                <div class="multi-dropdown-panel" id="channelDropdownPanel" style="display:none;">
+                    <label class="multi-dropdown-item">
+                        <input type="checkbox" id="channelSelectAll" checked> <span>全选</span>
+                    </label>
+                    <div id="channelList"></div>
+                </div>
             </div>
         </div>
         <div class="form-item">
@@ -741,8 +759,9 @@
                     <button class="tab-btn active">部分</button>
                     <button class="tab-btn">排除</button>
                 </div>
-                <div class="drama-search-row">
-                    <select class="search-dim" id="dramaSearchDim">
+                <div class="drama-filter-area">
+                    <div class="drama-search-row">
+                        <select class="search-dim" id="dramaSearchDim">
                         <option value="drama_name">短剧名称</option>
                         <option value="script_id">剧本编号</option>
                         <option value="script_name">剧本名称</option>
@@ -771,57 +790,7 @@
                                     <th>语种</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240501001</td>
-                                    <td>病区晚风（AI配音）</td>
-                                    <td>(Dubbed) Scheme for My Wealth? No Way!</td>
-                                    <td>English</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240502002</td>
-                                    <td>Falling in love by a mistaken vow-3</td>
-                                    <td>Falling in love by a mistaken vow</td>
-                                    <td>English</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240503003</td>
-                                    <td>退婚后，迟机长他争又抢</td>
-                                    <td>You Cheat? I Got Better.</td>
-                                    <td>English</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240504004</td>
-                                    <td>No More Mercy for My Ex</td>
-                                    <td>No More Mercy for My Ex</td>
-                                    <td>English</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240505005</td>
-                                    <td>Cry For Losing Me-3</td>
-                                    <td>Cry For Losing Me</td>
-                                    <td>English</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240506006</td>
-                                    <td>漂移吧洗车大叔2赤子凌云-3</td>
-                                    <td>Drift King: Rise of the Phantom Racer</td>
-                                    <td>English</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>SC20240507007</td>
-                                    <td>栀栀屿归-3</td>
-                                    <td>Done Being the Mistress of My Billionaire Crush</td>
-                                    <td>English</td>
-                                </tr>
-                            </tbody>
+                            <tbody id="dramaTbody"></tbody>
                         </table>
                         <div class="pagination" style="padding: 10px; justify-content: center;">
                             <span style="margin-right: 10px;">共 5736 项</span>
@@ -867,6 +836,7 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -957,8 +927,9 @@
                     <button class="tab-btn active">部分</button>
                     <button class="tab-btn">排除</button>
                 </div>
-                <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="搜索推广链接">
+                <div class="link-filter-area">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="搜索推广链接">
                     <button class="search-btn">搜索</button>
                 </div>
                 <div class="batch-area" style="display:none;">
@@ -1020,6 +991,7 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -1109,16 +1081,6 @@
             </div>
         </div>
 
-        <!-- 炸量信号 -->
-        <div class="form-item">
-            <label class="form-label">炸量信号:</label>
-            <div class="form-content">
-                <select class="trigger-select">
-                    <option>是</option>
-                </select>
-            </div>
-        </div>
-
         <!-- 触发操作 -->
         <div class="form-item">
             <label class="form-label"><span>*</span>触发操作:</label>
@@ -1203,6 +1165,47 @@
                 { name: '2059180016855945218-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST', id: '2059180016855945218' },
                 { name: '2059187420557479937-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ', id: '2059187420557479937' },
                 { name: '2059160285495169025-PA287-FB-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN', id: '2059160285495169025' }
+            ],
+            dramas: [
+                { scriptId: 'SC20240501001', scriptName: '病区晚风（AI配音）', dramaName: '(Dubbed) Scheme for My Wealth? No Way!', lang: 'English' },
+                { scriptId: 'SC20240502002', scriptName: 'Falling in love by a mistaken vow-3', dramaName: 'Falling in love by a mistaken vow', lang: 'English' },
+                { scriptId: 'SC20240503003', scriptName: '退婚后，迟机长他争又抢', dramaName: 'You Cheat? I Got Better.', lang: 'English' },
+                { scriptId: 'SC20240504004', scriptName: 'No More Mercy for My Ex', dramaName: 'No More Mercy for My Ex', lang: 'English' },
+                { scriptId: 'SC20240505005', scriptName: 'Cry For Losing Me-3', dramaName: 'Cry For Losing Me', lang: 'English' },
+                { scriptId: 'SC20240506006', scriptName: '漂移吧洗车大叔2赤子凌云-3', dramaName: 'Drift King: Rise of the Phantom Racer', lang: 'English' },
+                { scriptId: 'SC20240507007', scriptName: '栀栀屿归-3', dramaName: 'Done Being the Mistress of My Billionaire Crush', lang: 'English' }
+            ]
+        },
+        nt: {
+            label: 'FB',
+            metrics: ['CPI', 'CAC', 'ARPPU', '纯空耗', '消耗', 'D0充值用户数', 'D0 ROI', 'D0广告ROI', '展示量(impression)', '点击量(click)', 'D0归因用户数'],
+            showChannel: true,
+            accounts: [
+                { name: 'FB-MAD-NT- FHH-西五-M13-0410-3', id: '35801740262838891' },
+                { name: 'FB-MAD-NT- FHH-西五-M13-0410-2', id: '2041381905512321' },
+                { name: 'FB-MAD-NT- FHH-西五-M13-0410-4', id: '9086851118360042' },
+                { name: 'FB-MAD-NT-XK-MGUO-TC/MY/JP/KR-曼东', id: '9616263801836011' },
+                { name: 'FB-MAD-NT-XK-MGUO-VN/ID/IN-曼东', id: '2302826464614072' },
+                { name: 'FB-MAD-NT-XK-MGUO-AR/TR/TH-曼东', id: '2297590561880006' },
+                { name: 'FB-MAD-NT-XK-东八区-TC/MY/JP/KR-曼东', id: '2492033395950641' }
+            ],
+            links: [
+                { name: '4059214674490560513-PA263-NT-0526-(AI Dubbed)逆天邪神-US-w2a-WT', id: '4059214674490560513' },
+                { name: '4059271375637975042-PA263-NT-0526-(AI Dubbed)逆天邪神-US-w2a-JZ', id: '4059271375637975042' },
+                { name: '4059271366024634369-PA263-NT-0526-(AI Dubbed)逆天邪神-US-w2a-JZ', id: '4059271366024634369' },
+                { name: '4059212498196242434-PA287-NT-0526-(AI Dubbed)都市最强赘婿-KR-w2a-XTING', id: '4059212498196242434' },
+                { name: '4059180016855945218-PA287-NT-0526-(AI Dubbed)都市最强赘婿-KR-w2a-SST', id: '4059180016855945218' },
+                { name: '4059187420557479937-PA287-NT-0526-(AI Dubbed)都市最强赘婿-KR-w2a-ZQQ', id: '4059187420557479937' },
+                { name: '4059160285495169025-PA287-NT-0526-(AI Dubbed)都市最强赘婿-KR-w2a-GLN', id: '4059160285495169025' }
+            ],
+            dramas: [
+                { scriptId: 'NT20240501001', scriptName: '逆天邪神（AI配音）', dramaName: '(Dubbed) Against the Gods', lang: 'English' },
+                { scriptId: 'NT20240502002', scriptName: '都市之最强赘婿', dramaName: 'The Supreme Son-in-Law', lang: 'English' },
+                { scriptId: 'NT20240503003', scriptName: '重生之都市修仙', dramaName: 'Rebirth of the Urban Immortal', lang: 'English' },
+                { scriptId: 'NT20240504004', scriptName: '神医嫡女', dramaName: 'The Divine Doctor\'s Daughter', lang: 'English' },
+                { scriptId: 'NT20240505005', scriptName: '绝世武魂', dramaName: 'Peerless Martial Spirit', lang: 'English' },
+                { scriptId: 'NT20240506006', scriptName: '逆天邪神2', dramaName: 'Against the Gods 2', lang: 'English' },
+                { scriptId: 'NT20240507007', scriptName: '我在冷宫开超市', dramaName: 'My Cold Palace Supermarket', lang: 'English' }
             ]
         },
         tt: {
@@ -1226,6 +1229,15 @@
                 { name: '3059180016855945218-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-SST', id: '3059180016855945218' },
                 { name: '3059187420557479937-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-ZQQ', id: '3059187420557479937' },
                 { name: '3059160285495169025-PA287-TT-0526-(AI Dubbed)灵蛇报恩-KR-w2a-GLN', id: '3059160285495169025' }
+            ],
+            dramas: [
+                { scriptId: 'SC20240501001', scriptName: '病区晚风（AI配音）', dramaName: '(Dubbed) Scheme for My Wealth? No Way!', lang: 'English' },
+                { scriptId: 'SC20240502002', scriptName: 'Falling in love by a mistaken vow-3', dramaName: 'Falling in love by a mistaken vow', lang: 'English' },
+                { scriptId: 'SC20240503003', scriptName: '退婚后，迟机长他争又抢', dramaName: 'You Cheat? I Got Better.', lang: 'English' },
+                { scriptId: 'SC20240504004', scriptName: 'No More Mercy for My Ex', dramaName: 'No More Mercy for My Ex', lang: 'English' },
+                { scriptId: 'SC20240505005', scriptName: 'Cry For Losing Me-3', dramaName: 'Cry For Losing Me', lang: 'English' },
+                { scriptId: 'SC20240506006', scriptName: '漂移吧洗车大叔2赤子凌云-3', dramaName: 'Drift King: Rise of the Phantom Racer', lang: 'English' },
+                { scriptId: 'SC20240507007', scriptName: '栀栀屿归-3', dramaName: 'Done Being the Mistress of My Billionaire Crush', lang: 'English' }
             ]
         }
     };
@@ -1259,7 +1271,7 @@
     function renderMiniProgramList() {
         const container = document.getElementById('miniProgramList');
         container.innerHTML = MINI_PROGRAMS.map(mp =>
-            `<label class="mp-dropdown-item">
+            `<label class="multi-dropdown-item">
                 <input type="checkbox" class="mp-checkbox" data-mp-id="${mp.id}" checked>
                 <span>${mp.name}</span>
             </label>`
@@ -1271,7 +1283,7 @@
     function updateMpTriggerText() {
         const checked = document.querySelectorAll('.mp-checkbox:checked');
         const total = document.querySelectorAll('.mp-checkbox');
-        const textEl = document.querySelector('.mp-trigger-text');
+        const textEl = document.querySelector('.multi-trigger-text');
         if (checked.length === 0) {
             textEl.textContent = '请选择小程序';
             textEl.classList.add('placeholder');
@@ -1336,6 +1348,148 @@
         }
     });
 
+    // ---------- 语种下拉多选 ----------
+    const LANGS = [
+        'English', '简体中文', '繁体中文', '日本語', '한국어',
+        'ไทย', 'Bahasa Indonesia', 'Tiếng Việt', 'Português', 'Español', 'العربية'
+    ];
+
+    function renderLangList() {
+        const container = document.getElementById('langList');
+        container.innerHTML = LANGS.map(l =>
+            `<label class="multi-dropdown-item">
+                <input type="checkbox" class="lang-checkbox" data-lang-name="${l}" checked>
+                <span>${l}</span>
+            </label>`
+        ).join('');
+        document.getElementById('langSelectAll').checked = true;
+        updateLangTriggerText();
+    }
+
+    function updateLangTriggerText() {
+        const checked = document.querySelectorAll('.lang-checkbox:checked');
+        const total = document.querySelectorAll('.lang-checkbox');
+        const textEl = document.querySelector('#langDropdown .multi-trigger-text');
+        if (checked.length === 0) {
+            textEl.textContent = '请选择语种';
+            textEl.classList.add('placeholder');
+        } else if (checked.length === total.length) {
+            textEl.textContent = '全部';
+            textEl.classList.remove('placeholder');
+        } else {
+            textEl.textContent = `已选 ${checked.length} 项`;
+            textEl.classList.remove('placeholder');
+        }
+    }
+
+    // 语种下拉开关
+    document.addEventListener('click', e => {
+        const trigger = document.getElementById('langDropdownTrigger');
+        const panel = document.getElementById('langDropdownPanel');
+        const dropdown = document.getElementById('langDropdown');
+        if (!trigger || !panel || !dropdown) return;
+
+        if (trigger.contains(e.target)) {
+            const isOpen = panel.style.display !== 'none';
+            panel.style.display = isOpen ? 'none' : '';
+        } else if (!dropdown.contains(e.target)) {
+            panel.style.display = 'none';
+        }
+    });
+
+    // 语种选择变更
+    document.addEventListener('change', e => {
+        if (e.target.id === 'langSelectAll') {
+            document.querySelectorAll('.lang-checkbox').forEach(cb => {
+                cb.checked = e.target.checked;
+            });
+            updateLangTriggerText();
+        }
+        if (e.target.classList.contains('lang-checkbox')) {
+            const allCbs = document.querySelectorAll('.lang-checkbox');
+            const checkedCbs = document.querySelectorAll('.lang-checkbox:checked');
+            document.getElementById('langSelectAll').checked =
+                allCbs.length > 0 && checkedCbs.length === allCbs.length;
+            updateLangTriggerText();
+        }
+    });
+
+    // 初始化语种
+    renderLangList();
+
+    // ---------- 渠道号名称下拉多选 ----------
+    const CHANNELS = [
+        'NASCUAAAAB-(收费)-ns投放SC新像素测试渠道通用',
+        'NASCUAAABB-(收费)-ns投放SC新像素标准渠道',
+        'NASCUAAACC-(免费)-ns投放SC通用素材渠道',
+        'NASCUAAADD-(收费)-ns投放SC海外投放渠道',
+        'NASCUAAAEE-(收费)-ns投放SC日韩投放渠道',
+        'NASCUAAAFF-(免费)-ns投放SC东南亚投放渠道'
+    ];
+
+    function renderChannelList() {
+        const container = document.getElementById('channelList');
+        container.innerHTML = CHANNELS.map(c =>
+            `<label class="multi-dropdown-item">
+                <input type="checkbox" class="channel-checkbox" data-channel-name="${c.replace(/"/g, '&quot;')}" checked>
+                <span>${c}</span>
+            </label>`
+        ).join('');
+        document.getElementById('channelSelectAll').checked = true;
+        updateChannelTriggerText();
+    }
+
+    function updateChannelTriggerText() {
+        const checked = document.querySelectorAll('.channel-checkbox:checked');
+        const total = document.querySelectorAll('.channel-checkbox');
+        const textEl = document.querySelector('#channelDropdown .multi-trigger-text');
+        if (checked.length === 0) {
+            textEl.textContent = '请选择渠道号';
+            textEl.classList.add('placeholder');
+        } else if (checked.length === total.length) {
+            textEl.textContent = '全部';
+            textEl.classList.remove('placeholder');
+        } else {
+            textEl.textContent = `已选 ${checked.length} 项`;
+            textEl.classList.remove('placeholder');
+        }
+    }
+
+    // 渠道号下拉开关
+    document.addEventListener('click', e => {
+        const trigger = document.getElementById('channelDropdownTrigger');
+        const panel = document.getElementById('channelDropdownPanel');
+        const dropdown = document.getElementById('channelDropdown');
+        if (!trigger || !panel || !dropdown) return;
+
+        if (trigger.contains(e.target)) {
+            const isOpen = panel.style.display !== 'none';
+            panel.style.display = isOpen ? 'none' : '';
+        } else if (!dropdown.contains(e.target)) {
+            panel.style.display = 'none';
+        }
+    });
+
+    // 渠道号选择变更
+    document.addEventListener('change', e => {
+        if (e.target.id === 'channelSelectAll') {
+            document.querySelectorAll('.channel-checkbox').forEach(cb => {
+                cb.checked = e.target.checked;
+            });
+            updateChannelTriggerText();
+        }
+        if (e.target.classList.contains('channel-checkbox')) {
+            const allCbs = document.querySelectorAll('.channel-checkbox');
+            const checkedCbs = document.querySelectorAll('.channel-checkbox:checked');
+            document.getElementById('channelSelectAll').checked =
+                allCbs.length > 0 && checkedCbs.length === allCbs.length;
+            updateChannelTriggerText();
+        }
+    });
+
+    // 初始化渠道号
+    renderChannelList();
+
     function renderAccountTable(accounts) {
         const tbody = document.getElementById('accountTbody');
         tbody.innerHTML = accounts.map((acc, i) => {
@@ -1360,6 +1514,19 @@
         ).join('');
     }
 
+    function renderDramaTable(dramas) {
+        const tbody = document.getElementById('dramaTbody');
+        tbody.innerHTML = dramas.map(d =>
+            `<tr>
+                <td><input type="checkbox"></td>
+                <td>${d.scriptId}</td>
+                <td>${d.scriptName}</td>
+                <td>${d.dramaName}</td>
+                <td>${d.lang}</td>
+            </tr>`
+        ).join('');
+    }
+
     function renderMetricSelects(metrics) {
         const optionsHtml = metrics.map(m => `<option>${m}</option>`).join('');
         document.querySelectorAll('.metric-select').forEach(sel => { sel.innerHTML = optionsHtml; });
@@ -1380,6 +1547,7 @@
         } else {
             renderLinkTable(config.links);
         }
+        renderDramaTable(config.dramas);
     }
 
     const appTypeSelect = document.getElementById('appType');
@@ -1391,6 +1559,7 @@
         document.getElementById('pageTitle').textContent = `创建[${config.label}]规则控损`;
         renderAccountTable(config.accounts);
         renderLinkTable(config.links);
+        renderDramaTable(config.dramas);
         renderMetricSelects(config.metrics);
     })();
 
@@ -1411,6 +1580,12 @@
             if (!btn) return;
             group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            // 全部时隐藏搜索/表格，部分/排除时显示
+            const wrapper = group.parentElement;
+            const filterArea = wrapper.querySelector('.drama-filter-area') || wrapper.querySelector('.link-filter-area');
+            if (filterArea) {
+                filterArea.style.display = (btn.textContent === '全部') ? 'none' : '';
+            }
         });
     });
 
@@ -1828,10 +2003,6 @@
         }
         if (currentGroup.length) data.triggerConditions.push(currentGroup);
 
-        // 炸量信号
-        const sigSelect = document.querySelectorAll('.trigger-select')[1];
-        data.explosionSignal = sigSelect?.value || '';
-
         // 触发操作
         data.triggerAction = document.querySelector('.action-btn.active')?.textContent || '';
 
@@ -1875,13 +2046,16 @@
 
         // 短剧范围
         data.appType = document.getElementById('appType').value;
-        const langTags = document.querySelectorAll('.tag-group:first-of-type .tag');
-        data.languages = [...langTags].map(t => t.textContent.replace(/×/, '').trim());
+        data.languages = [];
+        document.querySelectorAll('.lang-checkbox:checked').forEach(cb => {
+            data.languages.push(cb.dataset.langName);
+        });
         data.businessType = document.querySelectorAll('.input-box')[2]?.value || '';
-        data.channelName = '';
+        data.channelNames = [];
         if (APP_TYPE_CONFIG[data.appType].showChannel) {
-            const channelTag = document.querySelectorAll('.tag-group')[1]?.querySelector('.tag');
-            data.channelName = channelTag ? channelTag.textContent.replace(/×/, '').trim() : '';
+            document.querySelectorAll('.channel-checkbox:checked').forEach(cb => {
+                data.channelNames.push(cb.dataset.channelName);
+            });
         }
         data.dramas = [];
         const dramaContainers = document.querySelectorAll('.table-container');

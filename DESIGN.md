@@ -30,9 +30,9 @@
 │   │           └── .clear-all > a (清空全部)
 │   │
 │   ├── app类型: select (NetShort)
-│   ├── 语种: .tag-group > .tag × N (English, 简体中文)
+│   ├── 语种: .multi-dropdown 多选 (全选 + 11语种)
 │   ├── 业务类型: select (全部)
-│   ├── 渠道号名称: .tag-group > .tag
+│   ├── 渠道号名称: .multi-dropdown 多选 (仅 fb)
 │   │
 │   ├── 短剧范围: .form-item
 │   │   ├── .tab-group > .tab-btn × 3 (全部|部分|排除) 互斥
@@ -70,7 +70,6 @@
 │   │   ├── .or-line (或者 分隔符)
 │   │   └── .add-or-btn (+ 或者)
 │   │
-│   ├── 炸量信号: select (是|否)
 │   ├── 触发操作: .action-group > .action-btn × 4 互斥
 │   ├── 警告方式: radio (飞书)
 │   ├── 警告频率: input[60] + 分钟提醒一次
@@ -122,7 +121,6 @@
       }
     ]
   ],
-  "explosionSignal": "是|否",
   "triggerAction": "发送警告|关停计划|开启计划|调整预算",
   "warningMethod": "飞书",
   "warningFrequency": "string",
@@ -132,7 +130,7 @@
   "appType": "string",
   "languages": ["string"],
   "businessType": "string",
-  "channelName": "string",
+  "channelNames": ["string"],
   "dramas": [{"scriptName": "string", "language": "string"}],
   "departments": ["string"],
   "promotionLinks": [{"name": "string", "id": "string"}]
@@ -219,5 +217,4 @@
 | 响应式 | 无 | @media breakpoint 折叠双栏为上下布局 |
 | 部门"人员"Tab | 无内容 | 人员搜索 + 选择器 |
 | 调整预算 | 按钮已展示 | 点击后展开预算调整表单 |
-| 炸量信号 ⓘ | 纯文字 | tooltip/popover |
 | 已选部门卡片色 | 黄色 #ffc107 | 统一为蓝色主题 |
