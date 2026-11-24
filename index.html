@@ -1130,7 +1130,7 @@
     const APP_TYPE_CONFIG = {
         fb: {
             label: 'FB',
-            metrics: ['CPI', '老达标率', '新达标率', 'ROI', '消耗', '展示'],
+            metrics: ['CPI', '老达标率', '新达标率', 'ROI', '消耗', '展示', '智能控损判定'],
             showChannel: true,
             accounts: [
                 { name: 'FB-MAD-NS- FHH-西五-M13-0410-3', id: '25801740262838890' },
@@ -1162,7 +1162,7 @@
         },
         nt: {
             label: 'FB',
-            metrics: ['CPI', 'CAC', 'ARPPU', '纯空耗', '消耗', 'D0充值用户数', 'D0 ROI', 'D0广告ROI', '展示量(impression)', '点击量(click)', 'D0归因用户数'],
+            metrics: ['CPI', 'CAC', 'ARPPU', '纯空耗', '消耗', 'D0充值用户数', 'D0 ROI', 'D0广告ROI', '展示量(impression)', '点击量(click)', 'D0归因用户数', '智能控损判定'],
             showChannel: true,
             accounts: [
                 { name: 'FB-MAD-NT- FHH-西五-M13-0410-3', id: '35801740262838891' },
@@ -1194,7 +1194,7 @@
         },
         tt: {
             label: 'TT',
-            metrics: ['消耗', 'D0ROI', 'D0广告收入', 'D0广告ROI', '媒体ROAS', '媒体D0付费价值', '媒体D0ROAS', 'D0付费总数', '展示数', '点击数', 'D0付费金额', '纯空耗'],
+            metrics: ['消耗', 'D0ROI', 'D0广告收入', 'D0广告ROI', '媒体ROAS', '媒体D0付费价值', '媒体D0ROAS', 'D0付费总数', '展示数', '点击数', 'D0付费金额', '纯空耗', '智能控损判定'],
             showChannel: false,
             accounts: [
                 { name: 'TT-MAD-NS- FHH-西五-M13-0410-3', id: '35801740262838891' },
@@ -1516,6 +1516,45 @@
         document.querySelectorAll('.metric-select').forEach(sel => { sel.innerHTML = optionsHtml; });
     }
 
+    const SMART_METRIC = '智能控损判定';
+    const SMART_VALUE = '建议关停';
+
+    // 选中「智能控损判定」时锁定统计范围/运算符/阈值，判定逻辑由后台定义
+    function applyMetricMode(row) {
+        if (!row) return;
+        const metricSel = row.querySelector('.metric-select');
+        const statSel = row.querySelector('.stat-range-select');
+        const opSel = row.querySelector('.operator-select');
+        const valueInput = row.querySelector('.value-input');
+        if (!metricSel || !statSel || !opSel || !valueInput) return;
+        const isSmart = metricSel.value === SMART_METRIC;
+        statSel.disabled = isSmart;
+        opSel.disabled = isSmart;
+        valueInput.disabled = isSmart;
+        const percentSym = row.querySelector('.percent-symbol');
+        if (percentSym) percentSym.style.display = isSmart ? 'none' : '';
+        if (isSmart) {
+            if (!Array.from(opSel.options).some(o => o.value === '=')) {
+                opSel.dataset.smartOptions = opSel.innerHTML;
+                opSel.innerHTML = '<option>=</option>';
+            }
+            statSel.value = '累计';
+            opSel.value = '=';
+            valueInput.value = SMART_VALUE;
+        } else {
+            if (opSel.dataset.smartOptions) {
+                opSel.innerHTML = opSel.dataset.smartOptions;
+                delete opSel.dataset.smartOptions;
+                opSel.value = '>';
+            }
+            if (valueInput.value === SMART_VALUE) valueInput.value = '';
+        }
+    }
+
+    function syncMetricModes() {
+        document.querySelectorAll('.condition-row').forEach(applyMetricMode);
+    }
+
     const STAT_RANGES = ['累计', '自然日累计', '20分钟', '30分钟', '1小时', '2小时', '3小时', '4小时', '5小时', '6小时', '24小时', '近3天', '近5天', '近7天', '近14天'];
 
     function renderStatRangeSelects() {
@@ -1529,6 +1568,7 @@
         document.getElementById('channelFormItem').style.display = config.showChannel ? '' : 'none';
         renderAccountTable(config.accounts);
         renderMetricSelects(config.metrics);
+        syncMetricModes();
 
         const isMiniProgram = appTypeSelect.value === 'tt';
         document.getElementById('miniProgramFormItem').style.display = isMiniProgram ? '' : 'none';
@@ -1553,6 +1593,7 @@
         renderDramaTable(config.dramas);
         renderMetricSelects(config.metrics);
         renderStatRangeSelects();
+        syncMetricModes();
     })();
 
     // ========== 1. 状态切换 ==========
@@ -1979,12 +2020,13 @@
             if (node.classList.contains('condition-row')) {
                 const selects = node.querySelectorAll('select');
                 const inputs = node.querySelectorAll('input[type="text"]');
+                const metric = selects[0]?.value || '';
                 currentGroup.push({
-                    metric: selects[0]?.value || '',
+                    metric,
                     statRange: selects[1]?.value || '',
                     operator: selects[2]?.value || '',
                     value: inputs[0]?.value || '',
-                    isPercent: node.querySelector('.percent-symbol') !== null
+                    isPercent: metric !== SMART_METRIC && node.querySelector('.percent-symbol') !== null
                 });
             } else if (node.classList.contains('or-line')) {
                 if (currentGroup.length) data.triggerConditions.push(currentGroup);
