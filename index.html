@@ -377,6 +377,17 @@
             font-size: 14px;
             min-width: 180px;
         }
+        .condition-row.cond-dup {
+            background: #fdf2f2;
+            outline: 1px solid #e74c3c;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        .cond-dup-tip {
+            color: #e74c3c;
+            font-size: 12px;
+            white-space: nowrap;
+        }
         .percent-input {
             display: flex;
             align-items: center;
@@ -1593,6 +1604,11 @@
         renderDramaTable(config.dramas);
         renderMetricSelects(config.metrics);
         renderStatRangeSelects();
+        // 示例行默认统计范围各不相同，避免默认数据即触发同组重复校验
+        ['累计', '20分钟', '近7天'].forEach((range, i) => {
+            const row = document.querySelectorAll('#triggerCondition .condition-row')[i];
+            if (row) row.querySelector('.stat-range-select').value = range;
+        });
         syncMetricModes();
     })();
 
@@ -1696,18 +1712,66 @@
         return row;
     }
 
+    // 同一 AND 组内「指标 + 统计范围」不可重复；跨 OR 组不校验
+    function checkTriggerDuplicates() {
+        const groups = [];
+        let group = [];
+        for (const node of condContainer.children) {
+            if (node.classList.contains('condition-row')) {
+                group.push(node);
+            } else if (node.classList.contains('or-line')) {
+                if (group.length) groups.push(group);
+                group = [];
+            }
+        }
+        if (group.length) groups.push(group);
+
+        condContainer.querySelectorAll('.condition-row').forEach(row => {
+            row.classList.remove('cond-dup');
+            row.querySelector('.cond-dup-tip')?.remove();
+        });
+
+        const conflicts = [];
+        groups.forEach((rows, gi) => {
+            const counts = new Map();
+            rows.forEach(row => {
+                const metric = row.querySelector('.metric-select')?.value || '';
+                const range = row.querySelector('.stat-range-select')?.value || '';
+                const key = `${metric}|${range}`;
+                counts.set(key, (counts.get(key) || 0) + 1);
+            });
+            rows.forEach(row => {
+                const metric = row.querySelector('.metric-select')?.value || '';
+                const range = row.querySelector('.stat-range-select')?.value || '';
+                if ((counts.get(`${metric}|${range}`) || 0) < 2) return;
+                row.classList.add('cond-dup');
+                const tip = document.createElement('span');
+                tip.className = 'cond-dup-tip';
+                tip.textContent = '同组内该指标+统计范围重复';
+                row.appendChild(tip);
+                const desc = `第${gi + 1}组「${metric}」+「${range}」`;
+                if (!conflicts.includes(desc)) conflicts.push(desc);
+            });
+        });
+        return conflicts;
+    }
+
+    condContainer.addEventListener('change', e => {
+        const metricSel = e.target.closest('.metric-select');
+        if (metricSel) applyMetricMode(metricSel.closest('.condition-row'));
+        checkTriggerDuplicates();
+    });
+
     condContainer.addEventListener('click', e => {
         const btnAdd = e.target.closest('.btn-add');
         const btnDel = e.target.closest('.btn-del');
         const delText = e.target.closest('.delete-text');
         const addOr = e.target.closest('.add-or-btn');
 
-        // "+" on a row: clone and insert after
+        // "+" on a row: insert a reset (empty) row after
         if (btnAdd && btnAdd.closest('.condition-row')) {
-            const row = btnAdd.closest('.condition-row');
-            const clone = row.cloneNode(true);
-            clone.querySelectorAll('input').forEach(inp => { inp.value = ''; });
-            row.after(clone);
+            btnAdd.closest('.condition-row').after(createConditionRow());
+            checkTriggerDuplicates();
             return;
         }
 
@@ -1739,6 +1803,7 @@
                 else if (isNextOr) nextOr.remove(); // or-line below (first group case)
             }
             row.remove();
+            checkTriggerDuplicates();
             return;
         }
 
@@ -1750,6 +1815,7 @@
             const newRow = createConditionRow();
             addOr.before(orLine);
             addOr.before(newRow);
+            checkTriggerDuplicates();
         }
     });
 
@@ -1786,6 +1852,7 @@
         if (!leftWrap || !rightWrap) return;
         const leftTable = leftWrap.querySelector('table');
         const rightTable = rightWrap.querySelector('table');
+        if (!leftTable || !rightTable) return;
         const rightTbody = rightTable.querySelector('tbody');
         const rightCols = rightTable.querySelectorAll('thead th').length - 1; // minus 操作
         const leftTbody = leftTable.querySelector('tbody');
@@ -2001,6 +2068,12 @@
 
     // ========== 7. 保存 -- 收集表单数据 ==========
     document.querySelector('.save-btn').addEventListener('click', () => {
+        const dupConflicts = checkTriggerDuplicates();
+        if (dupConflicts.length) {
+            alert(`触发条件存在重复：${dupConflicts.join('；')}。同一规则组内相同指标需选择不同的统计范围。`);
+            return;
+        }
+
         const data = {};
 
         // 基本信息

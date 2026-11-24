@@ -62,5 +62,6 @@ onAppTypeChange()      ← app类型切换调度器
 - `REQUIREMENT-批量搜索.md` — 推广链接批量搜索需求
 - `REQUIREMENT-TikTok小程序.md` — TikTok 小程序 App 类型完整需求（F1-F9）
 - `REQUIREMENT-NetToon.md` — NetToon App 类型新增需求
+- `REQUIREMENT-触发条件重复约束.md` — 同组内「指标+统计范围」唯一性约束 + 保存阻断
 
 需求文档是规格说明，`index.html` 是实现。修改前先对需求文档确认预期行为。
